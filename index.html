@@ -1,0 +1,994 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>Soltá — Soltá lo que te pesa</title>
+<meta name="description" content="App de PNL para transformar emociones, sensaciones y dolor en 5 minutos. Cambio de submodalidades guiado paso a paso.">
+<meta name="theme-color" content="#6366F1">
+<script src="https://cdn.tailwindcss.com"></script>
+<script>
+  tailwind.config = {
+    theme: {
+      extend: {
+        colors: {
+          cream: '#FAF8F4',
+          ink: '#1F2937',
+          ind: { 50:'#EEF2FF', 100:'#E0E7FF', 500:'#6366F1', 600:'#4F46E5', 700:'#4338CA' },
+          mint: { 50:'#ECFDF5', 100:'#D1FAE5', 500:'#10B981', 700:'#047857' },
+          coral: { 100:'#FEE2E2', 500:'#F87171' },
+          amb: { 50:'#FEF7E6', 100:'#FEF3C7', 500:'#F59E0B' },
+        },
+        fontFamily: { sans: ['Inter','system-ui','sans-serif'] },
+      }
+    }
+  }
+</script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  *{ -webkit-tap-highlight-color: transparent; }
+  html,body{ font-family:'Inter',system-ui,sans-serif; background:#E5E7EB; }
+  .app{
+    width:100%; max-width:430px; min-height:100vh; margin:0 auto;
+    background:#FAF8F4; box-shadow:0 0 80px rgba(0,0,0,.08);
+    position:relative; overflow-x:hidden;
+  }
+  input[type=range]{
+    -webkit-appearance:none; width:100%; height:8px;
+    background:#E5E7EB; border-radius:9999px; outline:none;
+  }
+  input[type=range]::-webkit-slider-thumb{
+    -webkit-appearance:none; width:34px; height:34px; border-radius:50%;
+    background:#6366F1; border:4px solid #fff; cursor:pointer;
+    box-shadow:0 4px 12px rgba(99,102,241,.4);
+  }
+  input[type=range]::-moz-range-thumb{
+    width:30px; height:30px; border-radius:50%;
+    background:#6366F1; border:4px solid #fff; cursor:pointer;
+  }
+  .scroll-hide::-webkit-scrollbar{ display:none; }
+  .screen{ animation:fade .3s ease-out; }
+  @keyframes fade{ from{opacity:0;transform:translateY(10px)} to{opacity:1;transform:translateY(0)} }
+  .breathe{ animation:br 4s ease-in-out infinite; }
+  @keyframes br{ 0%,100%{transform:scale(1);opacity:.7} 50%{transform:scale(1.18);opacity:1} }
+  .breathe-slow{ animation:brs 7s ease-in-out infinite; }
+  @keyframes brs{ 0%,100%{transform:scale(.85);opacity:.5} 50%{transform:scale(1.25);opacity:1} }
+  .pulse-soft{ animation:ps 2.4s ease-in-out infinite; }
+  @keyframes ps{ 0%,100%{opacity:1} 50%{opacity:.7} }
+  .modal-overlay{ animation:fade .2s ease-out; }
+  .modal-content{ animation:slideUp .3s ease-out; }
+  @keyframes slideUp{ from{transform:translateY(20px);opacity:0} to{transform:translateY(0);opacity:1} }
+</style>
+</head>
+<body>
+<div class="app" id="app"></div>
+<div id="modal-root"></div>
+
+<script>
+/* ============================================================
+   ESTADO + PERSISTENCIA
+============================================================ */
+const DEFAULTS = {
+  screen:'home',
+  acceptedDisclaimer:false,
+  category:null,
+  formato:null,           // 'imagen' | 'pelicula' | 'sonido' | 'metafora'
+  intensityBefore:7,
+  intensityAfter:null,
+  visual:{ brillo:70, distancia:30, tamanio:60, color:1, asociado:'asociado' },
+  auditivo:{ hay:'si', volumen:60, distancia:40 },
+  kinestesico:{ peso:60, intensidad:70, temperatura:30, ubicacion:'pecho' },
+  modificaciones:[],
+  modIndex:0,             // step actual en transformación
+  ancla:'',
+  recurso:'',
+  paused:false,
+  sessions:[
+    { date:'Ayer', label:'Miedo a hablar en público', before:8, after:3, category:'Emoción', ancla:'tranquilo' },
+    { date:'Lun', label:'Dolor de cabeza tensional', before:7, after:2, category:'Dolor', ancla:'liviano' },
+    { date:'Sáb', label:'Recuerdo de discusión', before:9, after:5, category:'Recuerdo', ancla:'paz' },
+  ],
+};
+let state = JSON.parse(JSON.stringify(DEFAULTS));
+try{
+  const saved = localStorage.getItem('solta_state');
+  if(saved){
+    const s = JSON.parse(saved);
+    state.acceptedDisclaimer = s.acceptedDisclaimer || false;
+    state.sessions = s.sessions || state.sessions;
+  }
+}catch(e){}
+function saveState(){
+  try{
+    localStorage.setItem('solta_state', JSON.stringify({
+      acceptedDisclaimer: state.acceptedDisclaimer,
+      sessions: state.sessions.slice(0,30),
+    }));
+  }catch(e){}
+}
+saveState();
+
+const WA = "https://wa.me/5491170599871?text=" + encodeURIComponent(
+  "Hola Jere, vengo de la app Soltá y me gustaría reservar una sesión personal."
+);
+const IG = "https://instagram.com/jeremiasvargascoach";
+
+/* ============================================================
+   NAVEGACIÓN + TIMER
+============================================================ */
+let timer = { startedAt:null };
+function startTimer(){ timer.startedAt = Date.now(); }
+function tickTimer(){
+  if(!timer.startedAt) return '';
+  const t = Math.floor((Date.now() - timer.startedAt)/1000);
+  return `${Math.floor(t/60)}:${String(t%60).padStart(2,'0')}`;
+}
+function go(s){
+  if(s === 'sesion-1') startTimer();
+  state.screen = s;
+  closeModal();
+  render();
+  window.scrollTo({top:0,behavior:'instant'});
+}
+function back(){
+  const order = ['home','sesion-1','sesion-2a','sesion-2b','sesion-2c','sesion-V','sesion-A','sesion-K','sesion-7','sesion-cierre-respiro','sesion-cierre-medicion'];
+  const i = order.indexOf(state.screen);
+  if(i > 0) go(order[i-1]);
+  else go('home');
+}
+
+/* ============================================================
+   MODAL DE PAUSA
+============================================================ */
+function openPauseModal(){
+  document.getElementById('modal-root').innerHTML = `
+    <div class="modal-overlay fixed inset-0 bg-black/50 z-30 flex items-end sm:items-center justify-center p-0 sm:p-4" onclick="closeModal(event)">
+      <div class="modal-content bg-white rounded-t-3xl sm:rounded-3xl max-w-[400px] w-full p-6" onclick="event.stopPropagation()">
+        <div class="text-center mb-4">
+          <div class="inline-block w-14 h-14 rounded-full bg-ind-100 flex items-center justify-center text-2xl mb-3">⏸</div>
+          <h3 class="text-lg font-bold text-ink">¿Necesitás pausar?</h3>
+          <p class="text-sm text-stone-600 mt-1">Está bien parar acá. Podés volver cuando quieras y retomar.</p>
+        </div>
+        <button onclick="closeModal()" class="w-full bg-ind-500 hover:bg-ind-600 text-white py-3.5 rounded-2xl font-semibold mb-2">
+          Seguir con la sesión
+        </button>
+        <button onclick="cancelSession()" class="w-full bg-stone-100 hover:bg-stone-200 text-stone-700 py-3.5 rounded-2xl font-semibold">
+          Guardar y volver al inicio
+        </button>
+      </div>
+    </div>
+  `;
+}
+function closeModal(e){
+  if(e && e.target !== e.currentTarget) return;
+  document.getElementById('modal-root').innerHTML = '';
+}
+function cancelSession(){
+  state.modificaciones=[]; state.intensityAfter=null; state.ancla=''; state.modIndex=0;
+  closeModal();
+  go('home');
+}
+
+/* ============================================================
+   COMPONENTES UI
+============================================================ */
+function Header({title, sub, step, total, showBack=true, showTimer=false, showPause=false}){
+  return `
+    <div class="px-5 pt-5 pb-3 flex items-center gap-2 sticky top-0 bg-cream/90 backdrop-blur z-10">
+      ${showBack ? `<button onclick="back()" class="w-11 h-11 -ml-2 flex items-center justify-center text-2xl text-stone-700 active:scale-90 transition">←</button>` : '<div class="w-9"></div>'}
+      <div class="flex-1 text-center min-w-0">
+        <div class="text-base font-bold text-ink truncate">${title||''}</div>
+        ${sub ? `<div class="text-[11px] text-stone-500">${sub}</div>` : ''}
+      </div>
+      ${showTimer ? `<div class="text-[11px] text-stone-400 font-mono w-10 text-right" id="timer">${tickTimer()}</div>` : '<div class="w-10"></div>'}
+      ${showPause ? `<button onclick="openPauseModal()" class="w-11 h-11 -mr-2 flex items-center justify-center text-stone-500 active:scale-90 transition" title="Pausar">⏸</button>` : ''}
+    </div>
+    ${step ? `
+      <div class="px-5 mb-3">
+        <div class="h-1.5 bg-stone-200/70 rounded-full overflow-hidden">
+          <div class="h-full bg-gradient-to-r from-ind-500 to-ind-600 rounded-full transition-all duration-500" style="width:${(step/total)*100}%"></div>
+        </div>
+        <div class="flex justify-between mt-1.5 text-[10px] text-stone-400">
+          <span>Paso ${step} de ${total}</span>
+          <span>~${Math.max(1, total - step + 1)} min restantes</span>
+        </div>
+      </div>
+    ` : ''}
+  `;
+}
+
+function DisclaimerFooter(){
+  return `
+    <div class="px-5 pt-4 pb-6">
+      <button onclick="go('aviso')" class="w-full p-3 rounded-xl bg-amb-50 border border-amb-100 text-center">
+        <p class="text-[11px] text-stone-700 leading-tight">
+          ⚠ Este ejercicio NO reemplaza terapia · <span class="text-ind-600 underline">Leer aviso</span>
+        </p>
+      </button>
+    </div>
+  `;
+}
+
+/* ============================================================
+   PANTALLAS
+============================================================ */
+
+function ScreenHome(){
+  const last = state.sessions[0];
+  // Detectar tema repetido en últimas 5 sesiones
+  const recent = state.sessions.slice(0,5);
+  const counts = {};
+  recent.forEach(s => { counts[s.category] = (counts[s.category]||0)+1; });
+  const repeated = Object.entries(counts).find(([k,v]) => v >= 3);
+
+  return `
+    <div class="screen pb-32">
+      <!-- Brand bar -->
+      <div class="px-5 pt-7 pb-2 flex items-center justify-between">
+        <div>
+          <div class="text-3xl font-extrabold text-ink leading-tight">Soltá</div>
+          <div class="text-xs text-ind-600 italic mt-0.5">Soltá lo que te pesa.</div>
+        </div>
+        <button onclick="go('sobre')" class="w-10 h-10 rounded-full bg-white shadow-sm flex items-center justify-center text-stone-600 font-bold active:scale-95">i</button>
+      </div>
+
+      <!-- HERO -->
+      <div class="mx-5 mt-4 rounded-3xl bg-gradient-to-br from-ind-500 to-ind-600 p-6 shadow-xl shadow-ind-500/20">
+        <div class="text-white/90 text-sm font-medium mb-1">¿Algo te está pesando?</div>
+        <div class="text-white text-2xl font-bold leading-tight mb-1">5 minutos</div>
+        <div class="text-white/80 text-sm mb-5">y vas a sentir el alivio.</div>
+        <button onclick="go('sesion-1')" class="w-full bg-white hover:bg-stone-50 text-ind-600 py-4 rounded-2xl font-bold text-base shadow-lg active:scale-[.98] transition">
+          Empezar ahora →
+        </button>
+      </div>
+
+      <!-- Recall del ancla anterior -->
+      ${last && last.ancla ? `
+        <div class="mx-5 mt-4 rounded-2xl bg-mint-50 border border-mint-100 p-4">
+          <div class="text-xs text-stone-500 uppercase tracking-wide font-semibold">${last.date}, anclaste</div>
+          <div class="flex items-baseline gap-2 mt-1">
+            <span class="text-2xl">⚓</span>
+            <div class="text-2xl font-extrabold text-mint-700 italic">"${last.ancla}"</div>
+          </div>
+          <div class="text-sm text-stone-700 mt-2">¿Cómo estás con eso hoy?</div>
+        </div>
+      ` : ''}
+
+      <!-- Sugerencia inteligente si tema se repite -->
+      ${repeated ? `
+        <div class="mx-5 mt-4 rounded-2xl bg-amb-50 border border-amb-100 p-4">
+          <div class="text-sm font-semibold text-ink mb-1">★ Notamos algo</div>
+          <p class="text-xs text-stone-700 leading-relaxed mb-3">
+            Trabajaste <strong>${repeated[0]}</strong> ${repeated[1]} veces últimamente.
+            A veces, cuando algo vuelve, ayuda hablarlo en una sesión personal.
+          </p>
+          <a href="${WA}" target="_blank" class="inline-block bg-mint-500 hover:opacity-90 text-white text-xs font-semibold px-4 py-2 rounded-xl">
+            Hablemos por WhatsApp →
+          </a>
+        </div>
+      ` : ''}
+
+      <!-- Última sesión -->
+      ${last ? `
+        <div class="mx-5 mt-4 rounded-2xl bg-white p-4 border border-stone-100">
+          <div class="flex items-center justify-between mb-2">
+            <div class="text-xs text-stone-500 uppercase tracking-wide font-semibold">Tu última sesión</div>
+            <button onclick="go('diario')" class="text-xs text-ind-600 font-semibold">Ver diario →</button>
+          </div>
+          <div class="text-sm font-semibold text-ink">${last.label}</div>
+          <div class="flex items-center gap-2 mt-3">
+            <div class="text-coral-500 text-2xl font-bold w-8">${last.before}</div>
+            <div class="flex-1 h-2 bg-stone-200 rounded-full overflow-hidden">
+              <div class="h-full bg-gradient-to-r from-coral-500 to-mint-500" style="width:${(last.before-last.after)*10}%"></div>
+            </div>
+            <div class="text-mint-500 text-2xl font-bold w-8 text-right">${last.after}</div>
+          </div>
+        </div>
+      ` : ''}
+
+      <!-- Sesiones personales con vos -->
+      <div class="mx-5 mt-4 rounded-2xl bg-mint-50 border border-mint-100 p-4">
+        <div class="flex items-start gap-3">
+          <div class="w-12 h-12 rounded-full bg-mint-500 flex items-center justify-center text-white font-bold text-lg flex-shrink-0">J</div>
+          <div class="flex-1 min-w-0">
+            <div class="text-sm font-semibold text-ink">Sesiones personales con Jere</div>
+            <div class="text-xs text-stone-600 mt-0.5">Acompañamiento 1 a 1 cuando lo necesites.</div>
+          </div>
+        </div>
+        <div class="grid grid-cols-2 gap-2 mt-3">
+          <a href="${WA}" target="_blank" class="bg-mint-500 hover:opacity-90 text-white text-xs font-semibold text-center py-2.5 rounded-xl active:scale-95 transition">WhatsApp →</a>
+          <a href="${IG}" target="_blank" class="bg-white hover:bg-stone-50 border border-stone-200 text-stone-700 text-xs font-semibold text-center py-2.5 rounded-xl active:scale-95 transition">Instagram →</a>
+        </div>
+      </div>
+
+      ${DisclaimerFooter()}
+    </div>
+  `;
+}
+
+function ScreenSesion1(){
+  const cats = [
+    { id:'Emoción difícil', icon:'❤', sub:'ansiedad, miedo, tristeza, enojo', bg:'bg-coral-100' },
+    { id:'Sensación física', icon:'◐', sub:'tensión, opresión, incomodidad', bg:'bg-amb-100' },
+    { id:'Recuerdo molesto', icon:'⤺', sub:'algo del pasado que aún duele', bg:'bg-ind-100' },
+    { id:'Hábito o impulso', icon:'⤻', sub:'algo que querés dejar de hacer', bg:'bg-mint-100' },
+  ];
+  return `
+    <div class="screen pb-32">
+      ${Header({title:'¿Qué te está pesando?', step:1, total:6, showTimer:true, showPause:true})}
+      <div class="px-5">
+        <div class="bg-white rounded-2xl p-5 mb-4 shadow-sm border border-stone-100">
+          <div class="text-sm font-semibold text-ink mb-3">¿Qué tan fuerte lo sentís ahora?</div>
+          <div class="flex items-center gap-4">
+            <input type="range" min="0" max="10" value="${state.intensityBefore}" oninput="state.intensityBefore=parseInt(this.value); document.getElementById('intDisplay').textContent=this.value">
+            <div class="text-4xl font-extrabold text-coral-500 w-12 text-right" id="intDisplay">${state.intensityBefore}</div>
+          </div>
+          <div class="flex justify-between text-[10px] text-stone-400 mt-2 uppercase">
+            <span>nada</span><span>insoportable</span>
+          </div>
+        </div>
+
+        <div class="text-sm font-semibold text-ink mb-2 px-1">Elegí qué tipo de cosa es:</div>
+        <div class="grid grid-cols-2 gap-3">
+          ${cats.map(c => `
+            <button onclick="state.category='${c.id}'; go('sesion-2a')" class="${c.bg} p-4 rounded-2xl text-left active:scale-95 transition">
+              <div class="text-2xl mb-2">${c.icon}</div>
+              <div class="text-sm font-bold text-ink">${c.id}</div>
+              <div class="text-[11px] text-stone-600 mt-1">${c.sub}</div>
+            </button>
+          `).join('')}
+        </div>
+      </div>
+      ${DisclaimerFooter()}
+    </div>
+  `;
+}
+
+function ScreenSesion2a(){
+  return `
+    <div class="screen pb-32 min-h-screen flex flex-col">
+      ${Header({title:'Hacé silencio interno', step:2, total:6, showTimer:true, showPause:true})}
+      <div class="px-5 flex-1 flex flex-col justify-center text-center">
+        <div class="mx-auto w-40 h-40 rounded-full bg-ind-100 flex items-center justify-center mb-6">
+          <div class="w-28 h-28 rounded-full bg-ind-500 breathe-slow flex items-center justify-center text-white text-3xl">
+            ✦
+          </div>
+        </div>
+        <h2 class="text-xl font-bold text-ink mb-2">Cerrá los ojos un momento</h2>
+        <p class="text-base text-stone-600 leading-relaxed">
+          Pensá en eso que querés transformar.
+          <br>Inhala, exhala. Sin apuro.
+        </p>
+        <div class="mt-8">
+          <button onclick="go('sesion-2b')" class="bg-ind-500 hover:bg-ind-600 text-white py-4 px-8 rounded-2xl font-semibold text-base shadow-lg active:scale-[.98] transition">
+            Listo, abrí los ojos →
+          </button>
+        </div>
+      </div>
+      ${DisclaimerFooter()}
+    </div>
+  `;
+}
+
+function ScreenSesion2b(){
+  const formatos = [
+    { id:'imagen', icon:'▣', label:'Una imagen', sub:'algo que veo, una foto, una escena' },
+    { id:'pelicula', icon:'▷', label:'Una película', sub:'una escena con movimiento' },
+    { id:'sonido', icon:'♪', label:'Un sonido', sub:'una voz, un ruido, una melodía' },
+    { id:'metafora', icon:'❀', label:'Una metáfora', sub:'algo simbólico — un peso, una tormenta' },
+  ];
+  return `
+    <div class="screen pb-32">
+      ${Header({title:'¿Qué forma tomó?', step:2, total:6, showTimer:true, showPause:true})}
+      <div class="px-5">
+        <div class="bg-white rounded-2xl p-5 mb-4 shadow-sm border border-stone-100">
+          <p class="text-sm text-stone-700 leading-relaxed">
+            <strong class="text-ink">Necesitás encontrar una representación de "eso".</strong>
+            ¿Qué forma tomó cuando la pensaste?
+          </p>
+        </div>
+
+        <div class="grid grid-cols-2 gap-3">
+          ${formatos.map(f => `
+            <button onclick="state.formato='${f.id}'; go('sesion-2c')" class="bg-white border-2 border-stone-200 hover:border-ind-500 active:scale-95 p-5 rounded-2xl text-left transition">
+              <div class="text-3xl mb-2">${f.icon}</div>
+              <div class="text-sm font-bold text-ink">${f.label}</div>
+              <div class="text-[11px] text-stone-500 mt-1">${f.sub}</div>
+            </button>
+          `).join('')}
+        </div>
+
+        <div class="mt-4 p-3 bg-ind-50 rounded-xl">
+          <p class="text-[11px] text-stone-700 leading-relaxed">
+            ★ Si tenés varias formas a la vez, elegí la más fuerte. Después podés volver y trabajar las otras.
+          </p>
+        </div>
+      </div>
+      ${DisclaimerFooter()}
+    </div>
+  `;
+}
+
+function ScreenSesion2c(){
+  return `
+    <div class="screen pb-32">
+      ${Header({title:'Llevala a tu pantalla', step:2, total:6, showTimer:true, showPause:true})}
+      <div class="px-5">
+        <div class="bg-white rounded-2xl p-5 mb-4 shadow-sm">
+          <p class="text-sm text-stone-700 leading-relaxed">
+            Imaginá que esa <strong class="text-ink">${state.formato || 'representación'}</strong> está proyectada en una pantalla de cine. Vos estás en la butaca, ella allá adelante.
+          </p>
+        </div>
+
+        <div class="bg-gradient-to-b from-stone-900 to-stone-800 rounded-3xl p-6 my-5 relative overflow-hidden">
+          <div class="absolute top-3 left-1/2 -translate-x-1/2 text-[9px] text-white/40 uppercase tracking-widest">PANTALLA</div>
+          <div class="flex justify-center my-8">
+            <div class="w-40 h-24 bg-white/10 rounded-xl backdrop-blur breathe flex items-center justify-center">
+              <span class="text-white/50 text-xs italic">tu ${state.formato || 'representación'}</span>
+            </div>
+          </div>
+          <div class="text-center text-[10px] text-white/40 mt-2">vos en la butaca ↓</div>
+        </div>
+
+        <div class="bg-mint-50 rounded-xl p-3 mb-5">
+          <p class="text-xs text-stone-700 leading-relaxed">
+            <strong class="text-mint-700">Verla desde afuera te da control.</strong>
+            No estás dentro de eso, lo estás observando como espectador.
+          </p>
+        </div>
+
+        <button onclick="go('sesion-V')" class="w-full bg-ind-500 hover:bg-ind-600 text-white py-4 rounded-2xl font-semibold shadow-lg active:scale-[.98] transition">
+          Ya la veo en la pantalla →
+        </button>
+      </div>
+      ${DisclaimerFooter()}
+    </div>
+  `;
+}
+
+/* SLIDER REACTIVO con preview visual */
+function ReactiveSlider({label, leftHint, rightHint, value, key, modality, preview}){
+  return `
+    <div class="bg-white rounded-2xl p-4 shadow-sm border border-stone-100">
+      <div class="flex items-baseline justify-between mb-3">
+        <div class="text-base font-semibold text-ink">${label}</div>
+        <div class="text-2xl font-bold text-ind-500" data-display="${modality}-${key}">${value}</div>
+      </div>
+      <!-- Preview reactivo -->
+      <div class="h-12 rounded-xl mb-3 flex items-center justify-center overflow-hidden bg-stone-100" data-preview="${modality}-${key}">
+        ${preview(value)}
+      </div>
+      <input type="range" min="0" max="100" value="${value}"
+        oninput="state.${modality}.${key}=parseInt(this.value); document.querySelector('[data-display=&quot;${modality}-${key}&quot;]').textContent=this.value; document.querySelector('[data-preview=&quot;${modality}-${key}&quot;]').innerHTML=PREVIEWS['${modality}-${key}'](parseInt(this.value));">
+      <div class="flex justify-between text-[10px] text-stone-400 mt-2 uppercase tracking-wide">
+        <span>${leftHint}</span><span>${rightHint}</span>
+      </div>
+    </div>
+  `;
+}
+
+/* PREVIEWS reactivos */
+const PREVIEWS = {
+  'visual-brillo': (v) => `<div class="w-20 h-8 rounded-lg" style="background:rgba(99,102,241,${0.15 + v/120});box-shadow:0 0 ${v/3}px rgba(99,102,241,${v/100})"></div>`,
+  'visual-distancia': (v) => {
+    const size = 50 - (v/100)*30;
+    return `<div class="rounded-lg bg-ind-500/40 transition-all" style="width:${size}px;height:${size*0.6}px"></div>`;
+  },
+  'visual-tamanio': (v) => {
+    const size = 12 + (v/100)*50;
+    return `<div class="rounded-lg bg-ind-500/50 transition-all" style="width:${size}px;height:${size*0.6}px"></div>`;
+  },
+  'auditivo-volumen': (v) => {
+    const bars = Math.ceil(v/12);
+    let html = '<div class="flex items-end gap-1 h-8">';
+    for(let i=0; i<8; i++){
+      const h = i < bars ? 8 + (i*3) : 4;
+      const op = i < bars ? 1 : 0.2;
+      html += `<div class="w-1.5 bg-ind-500 rounded-sm transition-all" style="height:${h}px;opacity:${op}"></div>`;
+    }
+    html += '</div>';
+    return html;
+  },
+  'auditivo-distancia': (v) => {
+    const offset = (v/100)*60 - 30;
+    return `<div class="text-2xl transition-all" style="transform:translateX(${offset}px) scale(${1.2 - v/200})">♪</div>`;
+  },
+  'kinestesico-peso': (v) => {
+    const drop = (v/100)*8;
+    return `<div class="text-2xl transition-all" style="transform:translateY(${drop}px)">${v < 30 ? '☁' : v < 70 ? '◐' : '⬛'}</div>`;
+  },
+  'kinestesico-intensidad': (v) => {
+    const scale = 0.6 + (v/100)*0.6;
+    return `<div class="rounded-full bg-coral-500/60 transition-all" style="width:${24*scale}px;height:${24*scale}px"></div>`;
+  },
+  'kinestesico-temperatura': (v) => {
+    const color = v < 50 ? `rgba(99,170,255,${0.4 + v/120})` : `rgba(248,113,113,${0.4 + (v-50)/100})`;
+    return `<div class="w-20 h-8 rounded-lg transition-all" style="background:${color}"></div>`;
+  },
+};
+
+function ScreenSesionV(){
+  const v = state.visual;
+  return `
+    <div class="screen pb-32">
+      ${Header({title:'Cómo se ve', step:3, total:6, showTimer:true, showPause:true})}
+      <div class="px-5">
+        <div class="bg-ind-50 rounded-xl p-2.5 mb-4 text-center">
+          <div class="text-[10px] uppercase tracking-widest text-ind-600 font-bold">SUBMODALIDADES VISUALES</div>
+        </div>
+
+        <div class="space-y-3">
+          ${ReactiveSlider({label:'Brillo', leftHint:'oscuro', rightHint:'brillante', value:v.brillo, key:'brillo', modality:'visual', preview:PREVIEWS['visual-brillo']})}
+          ${ReactiveSlider({label:'Distancia', leftHint:'cerca', rightHint:'lejos', value:v.distancia, key:'distancia', modality:'visual', preview:PREVIEWS['visual-distancia']})}
+          ${ReactiveSlider({label:'Tamaño', leftHint:'chica', rightHint:'enorme', value:v.tamanio, key:'tamanio', modality:'visual', preview:PREVIEWS['visual-tamanio']})}
+
+          <div class="bg-white rounded-2xl p-4 shadow-sm border border-stone-100">
+            <div class="text-base font-semibold text-ink mb-3">Color</div>
+            <div class="grid grid-cols-4 gap-2">
+              ${['B&N','Sepia','Suave','Vívido'].map((c,i) => `
+                <button onclick="state.visual.color=${i}; render()" class="${v.color===i?'bg-ind-500 text-white':'bg-stone-50 text-stone-700 border border-stone-200'} py-2.5 rounded-xl text-xs font-medium active:scale-95">${c}</button>
+              `).join('')}
+            </div>
+          </div>
+
+          <div class="bg-white rounded-2xl p-4 shadow-sm border border-stone-100">
+            <div class="text-base font-semibold text-ink mb-3">¿Cómo la ves?</div>
+            <div class="grid grid-cols-2 gap-2">
+              <button onclick="state.visual.asociado='asociado'; render()" class="${v.asociado==='asociado'?'bg-ind-500 text-white':'bg-stone-50 text-stone-700 border border-stone-200'} py-3 rounded-xl text-xs font-medium leading-tight active:scale-95">
+                Con tus ojos<br><span class="opacity-60">(asociado)</span>
+              </button>
+              <button onclick="state.visual.asociado='disociado'; render()" class="${v.asociado==='disociado'?'bg-ind-500 text-white':'bg-stone-50 text-stone-700 border border-stone-200'} py-3 rounded-xl text-xs font-medium leading-tight active:scale-95">
+                Te ves a vos<br><span class="opacity-60">(disociado)</span>
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <button onclick="go('sesion-A')" class="w-full bg-ind-500 hover:bg-ind-600 text-white py-4 rounded-2xl font-semibold shadow-lg active:scale-[.98] transition mt-5">
+          Siguiente: sonidos →
+        </button>
+      </div>
+      ${DisclaimerFooter()}
+    </div>
+  `;
+}
+
+function ScreenSesionA(){
+  const a = state.auditivo;
+  return `
+    <div class="screen pb-32">
+      ${Header({title:'Qué se escucha', step:4, total:6, showTimer:true, showPause:true})}
+      <div class="px-5">
+        <div class="bg-ind-50 rounded-xl p-2.5 mb-4 text-center">
+          <div class="text-[10px] uppercase tracking-widest text-ind-600 font-bold">SUBMODALIDADES AUDITIVAS</div>
+        </div>
+
+        <div class="bg-white rounded-2xl p-4 shadow-sm border border-stone-100 mb-3">
+          <div class="text-base font-semibold text-ink mb-3">¿Hay sonido en la representación?</div>
+          <div class="grid grid-cols-2 gap-2">
+            <button onclick="state.auditivo.hay='si'; render()" class="${a.hay==='si'?'bg-ind-500 text-white':'bg-stone-50 text-stone-700 border border-stone-200'} py-3.5 rounded-xl text-sm font-medium active:scale-95">Sí, hay sonido</button>
+            <button onclick="state.auditivo.hay='no'; render()" class="${a.hay==='no'?'bg-ind-500 text-white':'bg-stone-50 text-stone-700 border border-stone-200'} py-3.5 rounded-xl text-sm font-medium active:scale-95">Está en silencio</button>
+          </div>
+        </div>
+
+        ${a.hay === 'si' ? `
+          <div class="space-y-3">
+            ${ReactiveSlider({label:'Volumen', leftHint:'bajo', rightHint:'fuerte', value:a.volumen, key:'volumen', modality:'auditivo', preview:PREVIEWS['auditivo-volumen']})}
+            ${ReactiveSlider({label:'Distancia', leftHint:'cerca', rightHint:'lejos', value:a.distancia, key:'distancia', modality:'auditivo', preview:PREVIEWS['auditivo-distancia']})}
+          </div>
+        ` : `
+          <div class="bg-stone-50 rounded-2xl p-6 text-center">
+            <div class="text-3xl mb-2">∅</div>
+            <p class="text-sm text-stone-600">Anotamos: silencio.<br>Pasamos a las sensaciones del cuerpo.</p>
+          </div>
+        `}
+
+        <button onclick="go('sesion-K')" class="w-full bg-ind-500 hover:bg-ind-600 text-white py-4 rounded-2xl font-semibold shadow-lg active:scale-[.98] transition mt-5">
+          Siguiente: cuerpo →
+        </button>
+      </div>
+      ${DisclaimerFooter()}
+    </div>
+  `;
+}
+
+function ScreenSesionK(){
+  const k = state.kinestesico;
+  const zonas = ['cabeza','garganta','pecho','estómago','espalda','piernas'];
+  return `
+    <div class="screen pb-32">
+      ${Header({title:'Qué sentís en el cuerpo', step:5, total:6, showTimer:true, showPause:true})}
+      <div class="px-5">
+        <div class="bg-ind-50 rounded-xl p-2.5 mb-4 text-center">
+          <div class="text-[10px] uppercase tracking-widest text-ind-600 font-bold">SUBMODALIDADES KINESTÉSICAS</div>
+        </div>
+
+        <div class="space-y-3">
+          ${ReactiveSlider({label:'Peso', leftHint:'liviano', rightHint:'pesado', value:k.peso, key:'peso', modality:'kinestesico', preview:PREVIEWS['kinestesico-peso']})}
+          ${ReactiveSlider({label:'Intensidad', leftHint:'débil', rightHint:'fuerte', value:k.intensidad, key:'intensidad', modality:'kinestesico', preview:PREVIEWS['kinestesico-intensidad']})}
+          ${ReactiveSlider({label:'Temperatura', leftHint:'fría ❄', rightHint:'caliente ☀', value:k.temperatura, key:'temperatura', modality:'kinestesico', preview:PREVIEWS['kinestesico-temperatura']})}
+
+          <div class="bg-white rounded-2xl p-4 shadow-sm border border-stone-100">
+            <div class="text-base font-semibold text-ink mb-3">¿Dónde lo sentís?</div>
+            <div class="grid grid-cols-3 gap-2">
+              ${zonas.map(z => `
+                <button onclick="state.kinestesico.ubicacion='${z}'; render()" class="${k.ubicacion===z?'bg-ind-500 text-white':'bg-stone-50 text-stone-700 border border-stone-200'} py-2.5 rounded-xl text-xs font-medium capitalize active:scale-95">${z}</button>
+              `).join('')}
+            </div>
+          </div>
+        </div>
+
+        <button onclick="state.modIndex=0; state.modificaciones=[]; go('sesion-7')" class="w-full bg-ind-500 hover:bg-ind-600 text-white py-4 rounded-2xl font-semibold shadow-lg active:scale-[.98] transition mt-5">
+          Vamos a transformar →
+        </button>
+      </div>
+      ${DisclaimerFooter()}
+    </div>
+  `;
+}
+
+/* ============================================================
+   TRANSFORMACIÓN — STEPPER (una sugerencia a la vez)
+============================================================ */
+const SUGGESTIONS = [
+  { mod:'Bajá el brillo', side:'V', detail:'Hacela más oscura, atenuada — como bajándole la luz a una lámpara.' },
+  { mod:'Alejá la imagen', side:'V', detail:'Llevala al fondo de la pantalla, cada vez más lejos.' },
+  { mod:'Sacale el color', side:'V', detail:'Pasala a blanco y negro, como una foto vieja.' },
+  { mod:'Bajá el volumen', side:'A', detail:'Bajá el sonido casi hasta el silencio.' },
+  { mod:'Enfriá la sensación', side:'K', detail:'Imaginá agua fresca corriendo por esa zona del cuerpo.' },
+];
+
+function ScreenSesion7(){
+  const i = state.modIndex;
+  const s = SUGGESTIONS[i];
+  if(!s) return ScreenSesionTransicionCierre();
+
+  return `
+    <div class="screen pb-32">
+      ${Header({title:'Transformar', step:6, total:6, showTimer:true, showPause:true})}
+      <div class="px-5">
+        <div class="bg-mint-50 rounded-xl p-2.5 mb-4 text-center border border-mint-100">
+          <div class="text-[10px] uppercase tracking-widest text-mint-700 font-bold">SUGERENCIA ${i+1} DE ${SUGGESTIONS.length}</div>
+        </div>
+
+        <div class="bg-white rounded-3xl p-6 shadow-sm border border-stone-100 mb-4 text-center">
+          <div class="inline-block w-14 h-14 rounded-full bg-ind-100 flex items-center justify-center text-ind-600 font-bold text-lg mb-3">${s.side}</div>
+          <h2 class="text-2xl font-bold text-ink mb-3">${s.mod}</h2>
+          <p class="text-sm text-stone-600 leading-relaxed">${s.detail}</p>
+        </div>
+
+        <div class="bg-ind-50 rounded-2xl p-4 mb-5 text-center">
+          <p class="text-xs text-stone-700 leading-relaxed">
+            <strong class="text-ind-600">Probala unos segundos en tu mente.</strong><br>
+            Vos decidís si la aplicás o no.
+          </p>
+        </div>
+
+        <div class="space-y-2">
+          <button onclick="aplicarMod('${s.mod}')" class="w-full bg-mint-500 hover:opacity-90 text-white py-4 rounded-2xl font-semibold shadow-lg active:scale-[.98] transition">
+            ✓ La apliqué, me alivió
+          </button>
+          <button onclick="saltarMod()" class="w-full bg-stone-100 hover:bg-stone-200 text-stone-700 py-4 rounded-2xl font-semibold active:scale-[.98] transition">
+            No me cambió, probemos otra
+          </button>
+        </div>
+
+        <div class="mt-5 text-center text-xs text-stone-500">
+          Aplicadas hasta ahora: <strong class="text-mint-700">${state.modificaciones.length}</strong>
+        </div>
+      </div>
+      ${DisclaimerFooter()}
+    </div>
+  `;
+}
+
+function aplicarMod(mod){
+  if(!state.modificaciones.includes(mod)) state.modificaciones.push(mod);
+  saltarMod();
+}
+function saltarMod(){
+  state.modIndex++;
+  if(state.modIndex >= SUGGESTIONS.length){
+    go('sesion-cierre-respiro');
+  } else {
+    render();
+  }
+}
+
+function ScreenSesionTransicionCierre(){
+  go('sesion-cierre-respiro');
+  return '';
+}
+
+/* ============================================================
+   CIERRE EN DOS FASES: RESPIRACIÓN → MEDICIÓN
+============================================================ */
+function ScreenCierreRespiro(){
+  return `
+    <div class="screen pb-32 min-h-screen flex flex-col">
+      ${Header({title:'Anclá el cambio', showBack:false})}
+      <div class="px-5 flex-1 flex flex-col justify-center text-center">
+        <p class="text-sm text-stone-600 mb-5">Antes de medir nada, regalate un momento.</p>
+
+        <div class="mx-auto w-48 h-48 rounded-full bg-mint-100 flex items-center justify-center mb-6 relative">
+          <div class="absolute inset-0 rounded-full bg-mint-500/20 breathe-slow"></div>
+          <div class="relative z-10 w-32 h-32 rounded-full bg-mint-500 flex items-center justify-center">
+            <span class="text-white text-4xl">✦</span>
+          </div>
+        </div>
+
+        <h2 class="text-xl font-bold text-ink mb-2">Inhalá. Exhalá.</h2>
+        <p class="text-sm text-stone-600 mb-6">Quedate con esta nueva sensación. <br>Dale una palabra que la represente.</p>
+
+        <input type="text" placeholder="Ej: liviano, en paz, tranquilo, calma..."
+          oninput="state.ancla=this.value"
+          class="w-full bg-white px-5 py-4 rounded-2xl text-center text-lg font-semibold text-mint-700 placeholder:text-stone-300 placeholder:font-normal placeholder:text-base border-2 border-mint-100 focus:outline-none focus:border-mint-500 mb-5">
+
+        <button onclick="go('sesion-cierre-medicion')" class="w-full bg-mint-500 hover:opacity-90 text-white py-4 rounded-2xl font-semibold shadow-lg active:scale-[.98] transition">
+          Continuar →
+        </button>
+      </div>
+      ${DisclaimerFooter()}
+    </div>
+  `;
+}
+
+function ScreenCierreMedicion(){
+  const auto = Math.max(1, state.intensityBefore - Math.min(state.intensityBefore-1, state.modificaciones.length + 1));
+  const after = state.intensityAfter ?? auto;
+  const delta = state.intensityBefore - after;
+  const elapsed = tickTimer();
+  return `
+    <div class="screen pb-32">
+      ${Header({title:'Tu sesión', showBack:false})}
+      <div class="px-5">
+        <div class="text-center mb-5">
+          <div class="inline-flex items-center justify-center w-16 h-16 rounded-full bg-mint-500 mb-3">
+            <span class="text-white text-2xl">✓</span>
+          </div>
+          <h2 class="text-xl font-extrabold text-ink">Hiciste un trabajo bonito</h2>
+          ${state.ancla ? `<p class="text-sm text-mint-700 mt-1 italic">⚓ Anclaste "${state.ancla}"</p>` : ''}
+          ${elapsed ? `<div class="inline-block mt-2 text-[11px] text-ind-600 font-semibold bg-ind-50 px-3 py-1 rounded-full">⏱ ${elapsed} en total</div>` : ''}
+        </div>
+
+        <div class="bg-white rounded-2xl p-5 shadow-sm border border-stone-100 mb-4">
+          <div class="text-sm font-semibold text-ink mb-3">¿Qué tan fuerte lo sentís ahora?</div>
+          <div class="flex items-center gap-4">
+            <input type="range" min="0" max="10" value="${after}" oninput="state.intensityAfter=parseInt(this.value); document.getElementById('aDisplay').textContent=this.value; document.getElementById('dText').textContent='Bajaste '+(${state.intensityBefore}-parseInt(this.value))+' puntos'; document.getElementById('barFill').style.width=((${state.intensityBefore}-parseInt(this.value))*10)+'%'">
+            <div class="text-4xl font-extrabold text-mint-500 w-12 text-right" id="aDisplay">${after}</div>
+          </div>
+
+          <div class="grid grid-cols-2 gap-3 mt-5 pt-4 border-t border-stone-100">
+            <div class="text-center">
+              <div class="text-[10px] text-stone-500 uppercase tracking-wider">Antes</div>
+              <div class="text-4xl font-extrabold text-coral-500">${state.intensityBefore}</div>
+            </div>
+            <div class="text-center">
+              <div class="text-[10px] text-stone-500 uppercase tracking-wider">Ahora</div>
+              <div class="text-4xl font-extrabold text-mint-500">${after}</div>
+            </div>
+          </div>
+          <div class="mt-3 h-2 bg-stone-200 rounded-full overflow-hidden">
+            <div class="h-full bg-gradient-to-r from-coral-500 to-mint-500" id="barFill" style="width:${delta*10}%"></div>
+          </div>
+          <div class="text-center text-sm text-mint-700 font-bold mt-2" id="dText">Bajaste ${delta} puntos</div>
+        </div>
+
+        ${shouldShowDeepCTA() ? `
+          <div class="bg-mint-50 rounded-2xl p-4 mb-4 border border-mint-100">
+            <div class="flex items-start gap-3 mb-3">
+              <div class="w-10 h-10 rounded-full bg-mint-500 flex items-center justify-center text-white font-bold flex-shrink-0">J</div>
+              <div class="flex-1">
+                <div class="text-sm font-semibold text-ink">¿Querés profundizar?</div>
+                <div class="text-xs text-stone-600 mt-0.5">En una sesión personal trabajamos más a fondo lo que apareció.</div>
+              </div>
+            </div>
+            <a href="${WA}" target="_blank" class="block bg-mint-500 hover:opacity-90 text-white text-sm text-center font-semibold py-3 rounded-xl active:scale-[.98] transition">
+              WhatsApp con Jere →
+            </a>
+          </div>
+        ` : ''}
+
+        <button onclick="finishSession()" class="w-full bg-ind-500 hover:bg-ind-600 text-white py-4 rounded-2xl font-semibold shadow-lg active:scale-[.98] transition">
+          Guardar y volver al inicio
+        </button>
+      </div>
+      ${DisclaimerFooter()}
+    </div>
+  `;
+}
+
+/* CTA de WhatsApp aparece solo a partir de la 3ra sesión, no en cada cierre */
+function shouldShowDeepCTA(){
+  return state.sessions.length >= 2;
+}
+
+function finishSession(){
+  const after = state.intensityAfter ?? Math.max(1, state.intensityBefore - 4);
+  const today = new Date().toLocaleDateString('es-AR', { weekday:'short', day:'numeric' });
+  state.sessions.unshift({
+    date: 'Hoy ('+today+')',
+    label: state.category || 'Sesión',
+    before: state.intensityBefore,
+    after: after,
+    category: (state.category||'').split(' ')[0] || 'Otro',
+    ancla: state.ancla || '',
+  });
+  state.modificaciones = [];
+  state.intensityAfter = null;
+  state.modIndex = 0;
+  state.ancla = '';
+  state.formato = null;
+  saveState();
+  go('home');
+}
+
+function ScreenDiario(){
+  const ss = state.sessions;
+  const points = ss.slice().reverse().map((s,i,a) => ({
+    x: 20 + (i * (260 / Math.max(1, a.length-1))),
+    y: 90 - s.after * 7,
+  }));
+  const avgDelta = (ss.reduce((acc,s)=>acc+(s.before-s.after),0) / Math.max(1,ss.length)).toFixed(1);
+  return `
+    <div class="screen pb-32">
+      <div class="px-5 pt-7 pb-2 flex items-center justify-between">
+        <div>
+          <div class="text-2xl font-extrabold text-ink">Tu diario</div>
+          <div class="text-xs text-stone-500">Tu progreso emocional</div>
+        </div>
+        <button onclick="go('home')" class="w-10 h-10 rounded-full bg-white shadow-sm flex items-center justify-center text-stone-600 active:scale-95">×</button>
+      </div>
+
+      <div class="mx-5 mt-4 bg-white rounded-2xl p-5 shadow-sm border border-stone-100">
+        <div class="text-sm font-semibold text-ink mb-1">Intensidad despues de cada sesion</div>
+        <div class="text-xs text-mint-700 font-semibold mb-3">tendencia descendente</div>
+        <svg viewBox="0 0 300 110" class="w-full h-28">
+          <defs>
+            <linearGradient id="grad" x1="0" x2="0" y1="0" y2="1">
+              <stop offset="0%" stop-color="#6366F1" stop-opacity="0.3"/>
+              <stop offset="100%" stop-color="#6366F1" stop-opacity="0"/>
+            </linearGradient>
+          </defs>
+          ${points.length>1 ? `<path d="M ${points[0].x} 100 ${points.map(p=>`L ${p.x} ${p.y}`).join(' ')} L ${points[points.length-1].x} 100 Z" fill="url(#grad)"/>` : ''}
+          ${points.map((p,i) => i>0 ? `<line x1="${points[i-1].x}" y1="${points[i-1].y}" x2="${p.x}" y2="${p.y}" stroke="#6366F1" stroke-width="2.5"/>` : '').join('')}
+          ${points.map(p => `<circle cx="${p.x}" cy="${p.y}" r="5" fill="#6366F1" stroke="white" stroke-width="2"/>`).join('')}
+        </svg>
+        <div class="grid grid-cols-3 gap-2 mt-3 pt-3 border-t border-stone-100">
+          <div class="text-center"><div class="text-2xl font-extrabold text-ink">${ss.length}</div><div class="text-[10px] text-stone-500 uppercase">sesiones</div></div>
+          <div class="text-center"><div class="text-2xl font-extrabold text-mint-500">${avgDelta}</div><div class="text-[10px] text-stone-500 uppercase">alivio promedio</div></div>
+          <div class="text-center"><div class="text-2xl font-extrabold text-ind-600">${ss.length}d</div><div class="text-[10px] text-stone-500 uppercase">racha</div></div>
+        </div>
+      </div>
+
+      <div class="mx-5 mt-4">
+        <div class="text-sm font-semibold text-ink mb-3 px-1">Sesiones recientes</div>
+        <div class="space-y-2">
+          ${ss.map(s => `
+            <div class="bg-white rounded-2xl p-4 border border-stone-100">
+              <div class="flex items-start justify-between mb-1">
+                <div class="font-semibold text-sm text-ink">${s.label}</div>
+                <span class="text-[10px] bg-ind-100 text-ind-700 px-2 py-0.5 rounded-full font-medium">${s.category}</span>
+              </div>
+              <div class="text-[11px] text-stone-400">${s.date}${s.ancla ? ' &bull; ' + s.ancla : ''}</div>
+              <div class="flex items-center gap-2 mt-2.5">
+                <span class="text-coral-500 font-bold">${s.before}</span>
+                <div class="flex-1 h-1.5 bg-stone-200 rounded-full overflow-hidden">
+                  <div class="h-full bg-gradient-to-r from-coral-500 to-mint-500" style="width:${(s.before-s.after)*10}%"></div>
+                </div>
+                <span class="text-mint-500 font-bold">${s.after}</span>
+              </div>
+            </div>
+          `).join('')}
+        </div>
+      </div>
+      ${DisclaimerFooter()}
+    </div>
+  `;
+}
+
+function ScreenSobre(){
+  return `
+    <div class="screen pb-32">
+      ${Header({title:'Sobre la tecnica'})}
+      <div class="px-5">
+        <div class="bg-gradient-to-br from-ind-500 to-ind-600 rounded-3xl p-5 mb-4 text-white">
+          <div class="text-[11px] uppercase tracking-widest opacity-80 font-bold">PNL - Cambio de submodalidades</div>
+          <h2 class="text-xl font-bold mt-2 leading-tight">Tu mente piensa en imagenes, sonidos y sensaciones.</h2>
+          <p class="text-sm mt-3 opacity-90">Cambiando como recordas algo, cambias como te impacta. No el contenido - la forma.</p>
+        </div>
+
+        ${[
+          ['Que son las submodalidades?', 'Son las propiedades finas de como percibis un recuerdo: brillo de la imagen, distancia, temperatura de la sensacion. Pequenos ajustes en estas propiedades cambian la intensidad emocional.'],
+          ['Como funciona?', '6 pasos guiados: chequeas como te sentis, elegis que trabajar, encontras una representacion, la disocias en una pantalla mental, indagas como es (V/A/K), modificas y anclas.'],
+          ['Para que sirve?', 'Para situaciones conflictivas, sensaciones displacenteras, dolores fisicos (no reemplazando tratamiento) y emociones que se quieren modificar.'],
+          ['Es seguro?', 'Si. Trabajas siempre disociado y vos decidis cada cambio. La app solo sugiere; no induce. Si algo no te resuena, no lo aplicas.'],
+        ].map(qa => `
+          <div class="bg-white rounded-2xl p-4 mb-2.5 border border-stone-100">
+            <div class="font-semibold text-sm text-ink mb-1">${qa[0]}</div>
+            <p class="text-sm text-stone-600 leading-relaxed">${qa[1]}</p>
+          </div>
+        `).join('')}
+
+        <div class="bg-stone-50 rounded-2xl p-4 mt-4 border border-stone-200">
+          <div class="font-semibold text-xs text-ink mb-1">Fuente</div>
+          <p class="text-[11px] text-stone-500 leading-relaxed">
+            Andreas &amp; Andreas, "Use su cabeza para variar". Saint Paul &amp; Tenenbaum, "Excelencia Mental".
+          </p>
+        </div>
+
+        <div class="bg-mint-50 rounded-2xl p-4 mt-4 border border-mint-100">
+          <div class="text-sm font-semibold text-ink mb-1">Sesiones personales?</div>
+          <a href="${WA}" target="_blank" class="block mt-2 bg-mint-500 hover:opacity-90 text-white text-sm text-center font-semibold py-3 rounded-xl">
+            Escribime por WhatsApp
+          </a>
+        </div>
+      </div>
+      ${DisclaimerFooter()}
+    </div>
+  `;
+}
+
+function ScreenAviso(){
+  return `
+    <div class="screen pb-12">
+      ${Header({title:'Aviso importante'})}
+      <div class="px-5">
+        <div class="bg-amb-50 border border-amb-100 rounded-2xl p-5">
+          <div class="text-3xl mb-2">!</div>
+          <p class="text-sm text-ink leading-relaxed mb-3">
+            <strong>Solta</strong> es una herramienta de auto-conocimiento basada en
+            <strong>Programacion Neurolinguistica (PNL)</strong>.
+          </p>
+          <p class="text-sm text-stone-700 leading-relaxed mb-3">
+            Los ejercicios que ofrece <strong>NO reemplazan</strong> ningun tratamiento psicologico,
+            psiquiatrico o medico, ni constituyen una sesion profesional de coaching o terapia.
+          </p>
+          <p class="text-sm text-stone-700 leading-relaxed mb-3">
+            Si estas atravesando una crisis emocional, ideas de dano hacia vos o hacia otros,
+            o un cuadro clinico activo, <strong>consulta con un profesional matriculado</strong> de la salud mental.
+          </p>
+          <a href="${WA}" target="_blank" class="block mt-4 bg-mint-500 hover:opacity-90 text-white text-sm text-center font-semibold py-3 rounded-xl">
+            Sesiones con Jere por WhatsApp
+          </a>
+        </div>
+      </div>
+    </div>
+  `;
+}
+
+function render(){
+  const map = {
+    home: ScreenHome,
+    'sesion-1': ScreenSesion1,
+    'sesion-2a': ScreenSesion2a,
+    'sesion-2b': ScreenSesion2b,
+    'sesion-2c': ScreenSesion2c,
+    'sesion-V': ScreenSesionV,
+    'sesion-A': ScreenSesionA,
+    'sesion-K': ScreenSesionK,
+    'sesion-7': ScreenSesion7,
+    'sesion-cierre-respiro': ScreenCierreRespiro,
+    'sesion-cierre-medicion': ScreenCierreMedicion,
+    diario: ScreenDiario,
+    sobre: ScreenSobre,
+    aviso: ScreenAviso,
+  };
+  document.getElementById('app').innerHTML = (map[state.screen] || ScreenHome)();
+  if(state.screen.startsWith('sesion-')) startTimerTick();
+}
+
+let timerInterval = null;
+function startTimerTick(){
+  if(timerInterval) clearInterval(timerInterval);
+  timerInterval = setInterval(function(){
+    var el = document.getElementById('timer');
+    if(el) el.textContent = tickTimer();
+  }, 1000);
+}
+
+render();
+</script>
+</body>
+</html>
