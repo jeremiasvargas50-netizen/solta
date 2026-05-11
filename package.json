@@ -1,11 +1,12 @@
 {
-  "name": "solta",
-  "version": "1.0.0",
-  "private": true,
-  "description": "Soltá lo que te pesa — App de PNL para transformar emociones, sensaciones y dolor en 5 minutos",
-  "scripts": {
-    "dev": "npx serve .",
-    "build": "echo 'static site, nothing to build'",
-    "start": "npx serve ."
-  }
+  "buildCommand": null,
+  "outputDirectory": ".",
+  "headers": [
+    {
+      "source": "/sw.js",
+      "headers": [
+        { "key": "Cache-Control", "value": "no-cache, no-store, must-revalidate" }
+      ]
+    }
+  ]
 }
