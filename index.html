@@ -1,0 +1,2582 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>Soltá — Soltá lo que te pesa</title>
+<meta name="description" content="App de PNL para transformar emociones, sensaciones y dolor en 5 minutos. Cambio de submodalidades guiado paso a paso.">
+<meta name="theme-color" content="#6366F1">
+
+<!-- PWA -->
+<link rel="manifest" href="./manifest.json">
+<link rel="icon" type="image/png" sizes="32x32" href="./favicon-32.png">
+<link rel="apple-touch-icon" sizes="180x180" href="./apple-touch-icon.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="Soltá">
+<meta name="mobile-web-app-capable" content="yes">
+
+<!-- Open Graph -->
+<meta property="og:type" content="website">
+<meta property="og:title" content="Soltá — Soltá lo que te pesa">
+<meta property="og:description" content="App de PNL para transformar emociones, sensaciones y dolor en 5 minutos.">
+<meta property="og:image" content="./icon-512.png">
+<meta property="og:locale" content="es_AR">
+<script src="https://cdn.tailwindcss.com"></script>
+<script>
+  tailwind.config = {
+    theme: {
+      extend: {
+        colors: {
+          cream: '#FAF8F4',
+          ink: '#1F2937',
+          ind: { 50:'#EEF2FF', 100:'#E0E7FF', 500:'#6366F1', 600:'#4F46E5', 700:'#4338CA' },
+          mint: { 50:'#ECFDF5', 100:'#D1FAE5', 500:'#10B981', 700:'#047857' },
+          coral: { 100:'#FEE2E2', 500:'#F87171' },
+          amb: { 50:'#FEF7E6', 100:'#FEF3C7', 500:'#F59E0B' },
+        },
+        fontFamily: { sans: ['Inter','system-ui','sans-serif'] },
+      }
+    }
+  }
+</script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  *{ -webkit-tap-highlight-color: transparent; }
+  /* Esquema de color por tema */
+  :root, [data-theme="light"]{
+    --bg: #FAF8F4; --bg-card: #FFFFFF; --bg-soft: #F5F5F4;
+    --ink: #1F2937; --muted: #6B7280; --border: #E5E7EB;
+    --outer-bg: #E5E7EB;
+  }
+  [data-theme="dark"]{
+    --bg: #0F172A; --bg-card: #1E293B; --bg-soft: #334155;
+    --ink: #F1F5F9; --muted: #94A3B8; --border: #334155;
+    --outer-bg: #020617;
+  }
+  [data-theme="sepia"]{
+    --bg: #F4ECD8; --bg-card: #FAF4E1; --bg-soft: #EFE5C9;
+    --ink: #3E2C1B; --muted: #8B6F4E; --border: #D9C9A3;
+    --outer-bg: #E5D4A8;
+  }
+  html,body{ font-family:'Inter',system-ui,sans-serif; background: var(--outer-bg); color: var(--ink); transition: background .3s, color .3s; }
+  .app{
+    width:100%; max-width:430px; min-height:100vh; margin:0 auto;
+    background: var(--bg); box-shadow:0 0 80px rgba(0,0,0,.08);
+    position:relative; overflow-x:hidden; transition: background .3s;
+  }
+  /* Adaptar elementos con bg-cream a la variable */
+  /* Dark mode: contraste completo */
+  [data-theme="dark"] .bg-cream\/90,
+  [data-theme="dark"] .bg-cream\/80,
+  [data-theme="dark"] .bg-cream { background-color: rgba(15,23,42,.95) !important; }
+  [data-theme="dark"] .bg-white, [data-theme="dark"] .bg-stone-50, [data-theme="dark"] .bg-stone-100 { background-color: var(--bg-card) !important; }
+  [data-theme="dark"] .bg-stone-200 { background-color: #334155 !important; }
+  [data-theme="dark"] .text-ink, [data-theme="dark"] .text-stone-800, [data-theme="dark"] .text-stone-900 { color: #F1F5F9 !important; }
+  [data-theme="dark"] .text-stone-700, [data-theme="dark"] .text-stone-600 { color: #E2E8F0 !important; }
+  [data-theme="dark"] .text-stone-500, [data-theme="dark"] .text-stone-400, [data-theme="dark"] .text-stone-300 { color: #CBD5E1 !important; }
+  [data-theme="dark"] .border-stone-100, [data-theme="dark"] .border-stone-200, [data-theme="dark"] .border-stone-300 { border-color: var(--border) !important; }
+  [data-theme="dark"] .bg-ind-50 { background-color: rgba(99,102,241,.15) !important; }
+  [data-theme="dark"] .bg-ind-100 { background-color: rgba(99,102,241,.25) !important; }
+  [data-theme="dark"] .bg-mint-50 { background-color: rgba(16,185,129,.15) !important; }
+  [data-theme="dark"] .bg-mint-100 { background-color: rgba(16,185,129,.25) !important; }
+  [data-theme="dark"] .bg-amb-50 { background-color: rgba(245,158,11,.15) !important; }
+  [data-theme="dark"] .bg-amb-100 { background-color: rgba(245,158,11,.25) !important; }
+  [data-theme="dark"] .bg-coral-100 { background-color: rgba(248,113,113,.2) !important; }
+  [data-theme="dark"] .text-ind-600, [data-theme="dark"] .text-ind-700 { color: #A5B4FC !important; }
+  [data-theme="dark"] .text-mint-700 { color: #6EE7B7 !important; }
+  [data-theme="dark"] .text-amb-700 { color: #FCD34D !important; }
+  [data-theme="dark"] .text-coral-500 { color: #FCA5A5 !important; }
+  [data-theme="dark"] .from-cream { --tw-gradient-from: #0F172A !important; }
+  [data-theme="dark"] .via-ind-50 { --tw-gradient-via: #1E293B !important; }
+  [data-theme="dark"] .to-mint-50 { --tw-gradient-to: #0F2922 !important; }
+  [data-theme="dark"] h1, [data-theme="dark"] h2, [data-theme="dark"] h3 { color: #F1F5F9; }
+  [data-theme="dark"] input[type=text], [data-theme="dark"] textarea { background-color: #1E293B !important; color: #F1F5F9 !important; border-color: #334155 !important; }
+  [data-theme="dark"] input[type=range] { accent-color: #6366F1; }
+  [data-theme="dark"] input::placeholder { color: #64748B !important; }
+  /* Portada: botones secundarios con bg blanco semi-transparente */
+  [data-theme="dark"] .bg-white\/80 { background-color: rgba(30,41,59,.8) !important; }
+  [data-theme="dark"] .hover\:bg-white:hover { background-color: rgba(30,41,59,1) !important; }
+  [data-theme="dark"] .bg-white\/20 { background-color: rgba(255,255,255,.15) !important; }
+  [data-theme="dark"] .bg-white\/10 { background-color: rgba(255,255,255,.08) !important; }
+  [data-theme="dark"] .text-stone-700.bg-white\/80 { color: #E2E8F0 !important; }
+  [data-theme="dark"] .text-ind-600, [data-theme="dark"] .text-ind-700 { color: #A5B4FC !important; }
+  [data-theme="dark"] .text-mint-700 { color: #6EE7B7 !important; }
+  [data-theme="dark"] .text-amb-700 { color: #FCD34D !important; }
+  [data-theme="dark"] .from-cream, [data-theme="dark"] .via-ind-50, [data-theme="dark"] .to-mint-50 { --tw-gradient-from: #0F172A; --tw-gradient-via: #1E293B; --tw-gradient-to: #064E3B; }
+  /* Sepia mode: contraste completo */
+  [data-theme="sepia"] .bg-white, [data-theme="sepia"] .bg-stone-50 { background-color: var(--bg-card) !important; }
+  [data-theme="sepia"] .bg-stone-100 { background-color: var(--bg-soft) !important; }
+  [data-theme="sepia"] .bg-stone-200 { background-color: #D9C9A3 !important; }
+  [data-theme="sepia"] .text-ink, [data-theme="sepia"] .text-stone-800, [data-theme="sepia"] .text-stone-900 { color: #3E2C1B !important; }
+  [data-theme="sepia"] .text-stone-700, [data-theme="sepia"] .text-stone-600 { color: #5D4632 !important; }
+  [data-theme="sepia"] .text-stone-500, [data-theme="sepia"] .text-stone-400 { color: #8B6F4E !important; }
+  [data-theme="sepia"] .text-ind-600, [data-theme="sepia"] .text-ind-700 { color: #4F46E5 !important; }
+  [data-theme="sepia"] .text-mint-700 { color: #047857 !important; }
+  [data-theme="sepia"] .border-stone-100, [data-theme="sepia"] .border-stone-200 { border-color: var(--border) !important; }
+  [data-theme="sepia"] .bg-cream\/90,
+  [data-theme="sepia"] .bg-cream\/80,
+  [data-theme="sepia"] .bg-cream { background-color: rgba(244,236,216,.95) !important; }
+  [data-theme="sepia"] .bg-white\/80 { background-color: rgba(244,236,216,.85) !important; }
+  [data-theme="sepia"] .from-cream { --tw-gradient-from: #F4ECD8 !important; }
+  [data-theme="sepia"] .via-ind-50 { --tw-gradient-via: #E8DFC4 !important; }
+  [data-theme="sepia"] .to-mint-50 { --tw-gradient-to: #DCD2B0 !important; }
+  [data-theme="sepia"] input[type=range] { accent-color: #6366F1; }
+  /* Headings */
+  [data-theme="dark"] h1, [data-theme="dark"] h2, [data-theme="dark"] h3 { color: #F1F5F9; }
+  [data-theme="sepia"] h1, [data-theme="sepia"] h2, [data-theme="sepia"] h3 { color: #3E2C1B; }
+  /* Inputs adaptan */
+  [data-theme="dark"] input[type=text], [data-theme="dark"] textarea { background-color: #1E293B !important; color: #F1F5F9 !important; border-color: #334155 !important; }
+  [data-theme="sepia"] input[type=text], [data-theme="sepia"] textarea { background-color: #FAF4E1 !important; color: #3E2C1B !important; border-color: #D9C9A3 !important; }
+  [data-theme="dark"] input[type=range] { accent-color: #6366F1; }
+  /* Placeholder legible */
+  [data-theme="dark"] input::placeholder { color: #64748B !important; }
+  [data-theme="sepia"] input::placeholder { color: #A38B5E !important; }
+  input[type=range]{
+    -webkit-appearance:none; width:100%; height:8px;
+    background:#E5E7EB; border-radius:9999px; outline:none;
+  }
+  input[type=range]::-webkit-slider-thumb{
+    -webkit-appearance:none; width:34px; height:34px; border-radius:50%;
+    background:#6366F1; border:4px solid #fff; cursor:pointer;
+    box-shadow:0 4px 12px rgba(99,102,241,.4);
+  }
+  input[type=range]::-moz-range-thumb{
+    width:30px; height:30px; border-radius:50%;
+    background:#6366F1; border:4px solid #fff; cursor:pointer;
+  }
+  .scroll-hide::-webkit-scrollbar{ display:none; }
+  .screen{ animation:fade .3s ease-out; }
+  @keyframes fade{ from{opacity:0;transform:translateY(10px)} to{opacity:1;transform:translateY(0)} }
+  .breathe{ animation:br 4s ease-in-out infinite; }
+  @keyframes br{ 0%,100%{transform:scale(1);opacity:.7} 50%{transform:scale(1.18);opacity:1} }
+  .breathe-slow{ animation:brs 7s ease-in-out infinite; }
+  @keyframes brs{ 0%,100%{transform:scale(.85);opacity:.5} 50%{transform:scale(1.25);opacity:1} }
+  .pulse-soft{ animation:ps 2.4s ease-in-out infinite; }
+  @keyframes ps{ 0%,100%{opacity:1} 50%{opacity:.7} }
+  .modal-overlay{ animation:fade .2s ease-out; }
+  .modal-content{ animation:slideUp .3s ease-out; }
+  @keyframes slideUp{ from{transform:translateY(20px);opacity:0} to{transform:translateY(0);opacity:1} }
+  /* Accesibilidad global: focus visible solo con teclado */
+  button:focus-visible, a:focus-visible, input:focus-visible, [role=button]:focus-visible {
+    outline: 3px solid #6366F1; outline-offset: 2px; border-radius: 8px;
+  }
+  button:focus:not(:focus-visible), a:focus:not(:focus-visible) { outline: none; }
+  /* Mini player de audio fijo */
+  .audio-player{
+    position: fixed; bottom: 16px; left: 50%; transform: translateX(-50%);
+    width: calc(100% - 32px); max-width: 380px; z-index: 25;
+    background: var(--bg-card, #FFFFFF); border: 1px solid var(--border, #E5E7EB);
+    border-radius: 9999px; box-shadow: 0 8px 24px rgba(0,0,0,.12);
+    display: flex; align-items: center; gap: 10px; padding: 6px 6px 6px 14px;
+  }
+  .audio-player input[type=range]{ height:4px; }
+</style>
+</head>
+<body>
+<div class="app" id="app"></div>
+<div id="modal-root"></div>
+<div id="audio-root"></div>
+
+<script>
+/* ============================================================
+   TEMA (claro / oscuro / sepia) — persistente en localStorage
+============================================================ */
+function applyTheme(theme){
+  const valid = ['light','dark','sepia'];
+  if(!valid.includes(theme)) theme = 'light';
+  document.documentElement.setAttribute('data-theme', theme);
+  try{ localStorage.setItem('solta_theme', theme); }catch(e){}
+}
+function getTheme(){
+  try{
+    const saved = localStorage.getItem('solta_theme');
+    if(saved) return saved;
+    // Sin preferencia guardada: respetar el sistema operativo
+    if(window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) return 'dark';
+    return 'light';
+  }catch(e){ return 'light'; }
+}
+applyTheme(getTheme());
+// Escuchar cambios del OS en tiempo real (solo si el usuario no eligió manualmente)
+try{
+  window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', e => {
+    if(!localStorage.getItem('solta_theme')){
+      applyTheme(e.matches ? 'dark' : 'light');
+    }
+  });
+}catch(e){}
+
+/* ============================================================
+   REPRODUCTOR 432Hz — Progresión de acordes ambient
+============================================================ */
+const Audio432 = (function(){
+  let ctx = null, master = null, lp = null, reverb = null;
+  let playing = false;
+  let volume = 0.3;
+  let chordTimer = null;
+  let chordIndex = 0;
+
+  // Afinación A=432 Hz: freq de cada nota (semitonos desde A4)
+  const A432 = 432;
+  const f = (semis) => A432 * Math.pow(2, semis / 12);
+
+  // Progresión ambient: Am — F — C — G (vi-IV-I-V), inversiones suaves
+  // Cada nota como semitonos desde A4 (A=0)
+  const chords = [
+    { name:'Am',  notes: [-12, -9,  0,  3,  7] },   // A2, C3, A3, C4, E4
+    { name:'F',   notes: [-16, -12, -4,  0,  3] },  // F2, A2, F3, A3, C4
+    { name:'C',   notes: [-9,  -5,  0,  3,  7] },   // C3, E3, A3, C4, E4 (with C as root)
+    { name:'G',   notes: [-14, -10, -2,  2,  5] },  // G2, B2, G3, B3, D4
+  ];
+
+  function makeReverb(){
+    // Convolver simple con impulse generado: reverb suave
+    const len = ctx.sampleRate * 2.5;
+    const ir = ctx.createBuffer(2, len, ctx.sampleRate);
+    for(let ch=0; ch<2; ch++){
+      const data = ir.getChannelData(ch);
+      for(let i=0; i<len; i++){
+        data[i] = (Math.random()*2-1) * Math.pow(1 - i/len, 2.5);
+      }
+    }
+    const conv = ctx.createConvolver();
+    conv.buffer = ir;
+    return conv;
+  }
+
+  function ensureCtx(){
+    if(ctx) return;
+    const AC = window.AudioContext || window.webkitAudioContext;
+    if(!AC) return;
+    ctx = new AC();
+    // Si el contexto se suspende mid-session (política autoplay), reactivarlo
+    ctx.onstatechange = function(){
+      if(ctx.state === 'suspended' && playing) ctx.resume();
+    };
+    master = ctx.createGain();
+    master.gain.value = volume;
+    lp = ctx.createBiquadFilter();
+    lp.type = 'lowpass';
+    lp.frequency.value = 1800;
+    lp.Q.value = 0.5;
+    reverb = makeReverb();
+    const wet = ctx.createGain(); wet.gain.value = 0.5;
+    const dry = ctx.createGain(); dry.gain.value = 0.7;
+    master.connect(lp);
+    lp.connect(dry).connect(ctx.destination);
+    lp.connect(reverb).connect(wet).connect(ctx.destination);
+  }
+
+  function playChord(chord, duration){
+    if(!ctx) return;
+    const now = ctx.currentTime;
+    const numNotes = chord.notes.length;
+    chord.notes.forEach((semi, i) => {
+      // Voz principal (sine)
+      const freq = f(semi);
+      const osc1 = ctx.createOscillator();
+      osc1.type = 'sine';
+      osc1.frequency.value = freq;
+      // Voz armónica (triangle, una octava arriba con menos volumen)
+      const osc2 = ctx.createOscillator();
+      osc2.type = 'triangle';
+      osc2.frequency.value = freq * 2;
+      // Detune sutil para vida (8-9 cents)
+      const osc3 = ctx.createOscillator();
+      osc3.type = 'sine';
+      osc3.frequency.value = freq;
+      osc3.detune.value = 6;
+
+      const g = ctx.createGain();
+      g.gain.value = 0;
+      // Envolvente ADSR ambient: attack 2s, sustain duration-3, release 1s
+      const peak = 0.18 / numNotes;
+      const attack = 1.5;
+      const release = 1.5;
+      g.gain.setValueAtTime(0, now);
+      g.gain.linearRampToValueAtTime(peak, now + attack);
+      g.gain.setValueAtTime(peak, now + duration - release);
+      g.gain.linearRampToValueAtTime(0, now + duration);
+
+      const g2 = ctx.createGain(); g2.gain.value = 0.25;
+      osc2.connect(g2).connect(g);
+      osc1.connect(g);
+      osc3.connect(g);
+      g.connect(master);
+
+      const startT = now;
+      const stopT = now + duration + 0.3;
+      osc1.start(startT); osc1.stop(stopT);
+      osc2.start(startT); osc2.stop(stopT);
+      osc3.start(startT); osc3.stop(stopT);
+    });
+  }
+
+  function progressLoop(){
+    if(!playing) return;
+    const chord = chords[chordIndex % chords.length];
+    const dur = 8;
+    playChord(chord, dur);
+    chordIndex++;
+    chordTimer = setTimeout(progressLoop, 6500); // overlap de ~1.5s entre acordes
+  }
+
+  function start(){
+    ensureCtx();
+    if(!ctx || playing) return;
+    if(ctx.state === 'suspended') ctx.resume();
+    master.gain.cancelScheduledValues(ctx.currentTime);
+    master.gain.setValueAtTime(0, ctx.currentTime);
+    master.gain.linearRampToValueAtTime(volume, ctx.currentTime + 1.5);
+    playing = true;
+    chordIndex = 0;
+    progressLoop();
+  }
+
+  function stop(){
+    if(!ctx || !playing) return;
+    playing = false;
+    if(chordTimer){ clearTimeout(chordTimer); chordTimer = null; }
+    const t = ctx.currentTime;
+    master.gain.cancelScheduledValues(t);
+    master.gain.setValueAtTime(master.gain.value, t);
+    master.gain.linearRampToValueAtTime(0, t + 1);
+    setTimeout(() => {
+      if(master) master.gain.value = volume;
+    }, 1100);
+  }
+
+  function setVolume(v){
+    volume = Math.max(0, Math.min(1, v));
+    if(master && playing){
+      master.gain.cancelScheduledValues(ctx.currentTime);
+      master.gain.linearRampToValueAtTime(volume, ctx.currentTime + 0.15);
+    } else if(master){
+      master.gain.value = volume;
+    }
+  }
+
+  return {
+    toggle(){ if(playing) stop(); else start(); window._renderAudioPlayer && window._renderAudioPlayer(); },
+    setVolume,
+    isPlaying(){ return playing; },
+    getVolume(){ return volume; },
+    resumeIfSuspended(){ if(ctx && ctx.state === 'suspended') ctx.resume(); },
+  };
+})();
+
+function toggleAudio(){ Audio432.toggle(); }
+function changeVolume(v){ Audio432.setVolume(parseFloat(v)/100); }
+
+function AudioPlayerWidget(){
+  if(!state.screen.startsWith('sesion-')) return '';
+  const playing = Audio432.isPlaying();
+  const vol = Math.round(Audio432.getVolume()*100);
+  return `
+    <div class="audio-player" role="region" aria-label="Reproductor de música 432Hz">
+      <button onclick="toggleAudio()" aria-label="${playing?'Pausar':'Reproducir'} música 432Hz" class="w-9 h-9 rounded-full bg-ind-500 text-white flex items-center justify-center text-sm shadow active:scale-95 transition flex-shrink-0">
+        ${playing ? '❚❚' : '▶'}
+      </button>
+      <div class="flex-1 min-w-0 text-[10px]">
+        <div class="font-semibold" style="color:var(--ink)">432 Hz</div>
+        <div style="color:var(--muted)">música relajante</div>
+      </div>
+      <input type="range" min="0" max="100" value="${vol}" oninput="changeVolume(this.value)" aria-label="Volumen" style="width:90px;">
+    </div>
+  `;
+}
+window._renderAudioPlayer = function(){
+  const root = document.getElementById('audio-root');
+  if(root) root.innerHTML = AudioPlayerWidget();
+};
+
+/* ============================================================
+   UTILIDADES (escape XSS, validación)
+============================================================ */
+function esc(v){
+  if(v == null) return '';
+  return String(v).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+}
+/** @typedef {{date:string,label:string,before:number,after:number,category:string,ancla:string}} Session */
+function isValidSession(s){
+  return s && typeof s === 'object'
+    && typeof s.before === 'number' && typeof s.after === 'number'
+    && typeof s.label === 'string' && typeof s.date === 'string';
+}
+
+/* ============================================================
+   ESTADO + PERSISTENCIA
+============================================================ */
+const DEFAULTS = {
+  screen:'portada',
+  acceptedDisclaimer:false,
+  category:null,
+  formato:null,           // 'imagen' | 'pelicula' | 'sonido' | 'metafora'
+  metaforaTipo:null,     // 'visual' | 'kinestesico'
+  intensityBefore:5,
+  intensityAfter:null,
+  visual:{ brillo:50, distancia:50, tamanio:50, color:null, asociado:null, movimiento:null, foco:null, ubicacion:null, marco:null, velocidad:null },
+  auditivo:{ hay:'si', volumen:50, distancia:50, tono:null, ritmo:null, voz:null, velocidad:null, ubicacion:null, timbre:null },
+  kinestesico:{ peso:50, intensidad:50, temperatura:50, ubicacion:'pecho', textura:null, movimiento:null, ritmo:null, tension:null, profundidad:null },
+  modificaciones:[],
+  modIndex:0,             // step actual en transformación
+  ancla:'',
+  anclaGesto: null,
+  recurso:'',
+  paused:false,
+  titulo:'',
+  draft:null,
+  prevScreen:null,  // pantalla anterior a sobre/aviso
+  musicChoice:null, // 'yes' | 'no' | null
+  habitoContexto: null,
+  habitoContextoLibre: '',
+  habitoDisparador: '',
+  showAdvanced: false,
+  showAdvancedA: false,
+  showAdvancedK: false,
+  _sobreSlide: 0,
+  smClave: null,
+  sessions:[],
+};
+// Limpiar versiones viejas del storage (sin datos demo)
+try{ localStorage.removeItem('solta_state'); }catch(e){}
+let state = JSON.parse(JSON.stringify(DEFAULTS));
+try{
+  const saved = localStorage.getItem('solta_state_v2');
+  if(saved){
+    const s = JSON.parse(saved);
+    state.acceptedDisclaimer = s.acceptedDisclaimer || false;
+    state.sessions = Array.isArray(s.sessions) ? s.sessions.filter(isValidSession) : [];
+    state.draft = s.draft && typeof s.draft === 'object' ? s.draft : null;
+    state.musicChoice = s.musicChoice || null;
+  }
+}catch(e){}
+function saveState(){
+  try{
+    localStorage.setItem('solta_state_v2', JSON.stringify({
+      acceptedDisclaimer: state.acceptedDisclaimer,
+      sessions: state.sessions.slice(0,30),
+      draft: state.draft,
+      musicChoice: state.musicChoice,
+    }));
+  }catch(e){}
+}
+saveState();
+
+const WA = "https://wa.me/5491170599871?text=" + encodeURIComponent(
+  "Hola Jere, vengo de la app Soltá y me gustaría reservar una sesión personal."
+);
+const IG = "https://instagram.com/jeremiasvargascoach";
+
+/* ============================================================
+   NAVEGACIÓN + TIMER
+============================================================ */
+let timer = { startedAt:null, accumulated:0, pausedAt:null };
+function startTimer(){
+  timer.startedAt = Date.now();
+  timer.accumulated = 0;
+  timer.pausedAt = null;
+}
+function pauseTimer(){
+  if(timer.startedAt && !timer.pausedAt){
+    timer.accumulated += Date.now() - timer.startedAt;
+    timer.pausedAt = Date.now();
+  }
+}
+function resumeTimerTab(){
+  if(timer.pausedAt){
+    timer.startedAt = Date.now();
+    timer.pausedAt = null;
+  }
+}
+function tickTimer(){
+  if(!timer.startedAt && !timer.accumulated) return '';
+  const base = timer.accumulated || 0;
+  const running = timer.pausedAt ? 0 : (Date.now() - (timer.startedAt || Date.now()));
+  const t = Math.floor((base + running)/1000);
+  return `${Math.floor(t/60)}:${String(t%60).padStart(2,'0')}`;
+}
+document.addEventListener('visibilitychange', function(){
+  if(document.hidden) pauseTimer(); else resumeTimerTab();
+});
+function go(s){
+  if(s === 'sesion-2a') startTimer();
+  if(s === 'sobre' || s === 'aviso') state.prevScreen = state.screen;
+  state.screen = s;
+  closeModal();
+  render();
+  window.scrollTo({top:0,behavior:'instant'});
+}
+function back(){
+  if((state.screen === 'sobre' || state.screen === 'aviso') && state.prevScreen){
+    const dest = state.prevScreen;
+    state.prevScreen = null;
+    go(dest);
+    return;
+  }
+  const order = ['home','sesion-1','sesion-2a','sesion-2b','sesion-2c','sesion-metafora-tipo','sesion-habito','sesion-V','sesion-A','sesion-K','sesion-7','sesion-smclave','sesion-reintegracion','sesion-futurepace','sesion-cierre-respiro','sesion-cierre-medicion'];
+  const i = order.indexOf(state.screen);
+  if(i > 0) go(order[i-1]);
+  else go('home');
+}
+
+/* ============================================================
+   MODAL DE PAUSA
+============================================================ */
+function openExitModal(){
+  document.getElementById('modal-root').innerHTML = `
+    <div class="modal-overlay fixed inset-0 bg-black/50 z-30 flex items-end sm:items-center justify-center p-0 sm:p-4" onclick="closeModal(event)">
+      <div class="modal-content bg-white rounded-t-3xl sm:rounded-3xl max-w-[400px] w-full p-6" onclick="event.stopPropagation()">
+        <div class="text-center mb-4">
+          <div class="inline-block w-14 h-14 rounded-full bg-stone-100 flex items-center justify-center text-2xl mb-3">🚪</div>
+          <h3 class="text-lg font-bold text-ink">¿Querés salir del ejercicio?</h3>
+          <p class="text-sm text-stone-600 mt-1">Podés guardar lo que hiciste o descartar todo.</p>
+        </div>
+        <button onclick="closeModal()" class="w-full bg-ind-500 hover:bg-ind-600 text-white py-3.5 rounded-2xl font-semibold mb-2">
+          Seguir con el ejercicio
+        </button>
+        <button onclick="pauseAndExit()" class="w-full bg-amb-100 hover:bg-amb-200 text-amb-700 py-3.5 rounded-2xl font-semibold mb-2">
+          Pausar y guardar borrador
+        </button>
+        <button onclick="discardSession()" class="w-full bg-coral-100 hover:bg-coral-200 text-coral-500 py-3.5 rounded-2xl font-semibold">
+          Descartar y volver al inicio
+        </button>
+      </div>
+    </div>
+  `;
+}
+function openPauseModal(){
+  document.getElementById('modal-root').innerHTML = `
+    <div class="modal-overlay fixed inset-0 bg-black/50 z-30 flex items-end sm:items-center justify-center p-0 sm:p-4" onclick="closeModal(event)">
+      <div class="modal-content bg-white rounded-t-3xl sm:rounded-3xl max-w-[400px] w-full p-6" onclick="event.stopPropagation()">
+        <div class="text-center mb-4">
+          <div class="inline-block w-14 h-14 rounded-full bg-ind-100 flex items-center justify-center text-2xl mb-3">⏸</div>
+          <h3 class="text-lg font-bold text-ink">¿Necesitás parar?</h3>
+          <p class="text-sm text-stone-600 mt-1">Está bien. Elegí cómo querés salir.</p>
+        </div>
+        <button onclick="closeModal()" class="w-full bg-ind-500 hover:bg-ind-600 text-white py-3.5 rounded-2xl font-semibold mb-2">
+          Seguir con el ejercicio
+        </button>
+        <button onclick="pauseAndExit()" class="w-full bg-amb-100 hover:bg-amb-200 text-amb-700 py-3.5 rounded-2xl font-semibold mb-2">
+          Pausar y guardar borrador
+        </button>
+        <button onclick="discardSession()" class="w-full bg-coral-100 hover:bg-coral-200 text-coral-500 py-3.5 rounded-2xl font-semibold">
+          Descartar y volver al inicio
+        </button>
+      </div>
+    </div>
+  `;
+}
+function closeModal(e){
+  if(e && e.target !== e.currentTarget) return;
+  document.getElementById('modal-root').innerHTML = '';
+}
+// Guardar borrador para retomar después
+function pauseAndExit(){
+  state.draft = {
+    screen: state.screen, category: state.category, titulo: state.titulo,
+    formato: state.formato, intensityBefore: state.intensityBefore,
+    visual: state.visual, auditivo: state.auditivo, kinestesico: state.kinestesico,
+    modificaciones: state.modificaciones, modIndex: state.modIndex, ancla: state.ancla,
+    musicChoice: state.musicChoice, savedAt: Date.now(),
+  };
+  saveState();
+  closeModal();
+  go('home');
+}
+// Descartar todo sin guardar
+function discardSession(){
+  state.modificaciones=[]; state.intensityAfter=null; state.ancla=''; state.modIndex=0;
+  state.titulo=''; state.category=null; state.formato=null;
+  state.habitoContexto=null; state.habitoContextoLibre=''; state.habitoDisparador='';
+  state.smClave=null;
+  state.showAdvanced=false; state.showAdvancedA=false; state.showAdvancedK=false;
+  state.draft = null;
+  saveState();
+  closeModal();
+  go('home');
+}
+// Mantener compatibilidad con código viejo que llamaba cancelSession
+function cancelSession(){ discardSession(); }
+// Retomar borrador
+function resumeDraft(){
+  if(!state.draft) return;
+  Object.assign(state, state.draft);
+  state.draft = null;
+  saveState();
+  go(state.screen);
+}
+
+/* ============================================================
+   COMPONENTES UI
+============================================================ */
+function Header({title, sub, step, total, showBack=true, showTimer=false, showPause=false}){
+  return `
+    <div class="px-5 pt-5 pb-3 flex items-center gap-2 sticky top-0 bg-cream/90 backdrop-blur z-10">
+      ${showBack ? `<button
+        onclick="back()"
+        oncontextmenu="openExitModal(); return false;"
+        ontouchstart="this._t=setTimeout(()=>{openExitModal();},600)"
+        ontouchend="clearTimeout(this._t)"
+        ontouchmove="clearTimeout(this._t)"
+        class="w-11 h-11 -ml-2 flex items-center justify-center text-2xl text-stone-700 active:scale-90 transition select-none">←</button>` : '<div class="w-9"></div>'}
+      <div class="flex-1 text-center min-w-0">
+        <div class="text-base font-bold text-ink truncate">${title||''}</div>
+        ${sub ? `<div class="text-[11px] text-stone-500">${sub}</div>` : ''}
+      </div>
+      ${showTimer ? `<div class="text-[11px] text-stone-400 font-mono w-10 text-right" id="timer">${tickTimer()}</div>` : '<div class="w-10"></div>'}
+      ${showPause ? `<button onclick="openPauseModal()" class="w-11 h-11 -mr-2 flex items-center justify-center text-stone-500 active:scale-90 transition" title="Pausar">⏸</button>` : ''}
+    </div>
+    ${step ? `
+      <div class="px-5 mb-3">
+        <div class="h-1.5 bg-stone-200/70 rounded-full overflow-hidden">
+          <div class="h-full bg-gradient-to-r from-ind-500 to-ind-600 rounded-full transition-all duration-500" style="width:${(step/total)*100}%"></div>
+        </div>
+        <div class="flex justify-between mt-1.5 text-[10px] text-stone-400">
+          <span>Paso ${step} de ${total}</span>
+          <span>~${Math.max(1, total - step + 1)} min restantes</span>
+        </div>
+      </div>
+    ` : ''}
+  `;
+}
+
+function DisclaimerFooter(compact=false){
+  if(compact){
+    return `
+      <div class="px-5 pt-2 pb-6 text-center">
+        <button onclick="go('aviso')" class="text-[11px] text-stone-400 hover:text-stone-600 transition">
+          ⚠ <span class="underline">Aviso ético</span>
+        </button>
+      </div>
+    `;
+  }
+  return `
+    <div class="px-5 pt-4 pb-6">
+      <button onclick="go('aviso')" class="w-full p-3 rounded-xl bg-amb-50 border border-amb-100 text-center">
+        <p class="text-[11px] text-stone-700 leading-tight">
+          ⚠ Este ejercicio NO reemplaza terapia · <span class="text-ind-600 underline">Leer aviso</span>
+        </p>
+      </button>
+    </div>
+  `;
+}
+
+/* ============================================================
+   PANTALLAS
+============================================================ */
+
+function ScreenPortada(){
+  const theme = getTheme();
+  return `
+    <div class="screen min-h-screen flex flex-col bg-gradient-to-b from-ind-50 to-mint-50 relative overflow-hidden">
+
+      <!-- Selector de tema -->
+      <div class="absolute top-5 right-5 z-20">
+        ${(function(){const t=getTheme();return `
+        <div class="flex gap-1 bg-white/70 backdrop-blur rounded-xl p-1 border border-white/60 shadow-sm" role="group" aria-label="Esquema de color">
+          <button onclick="applyTheme('light'); render()" class="${t==='light'?'bg-ind-500 text-white':'text-stone-600'} w-8 h-8 rounded-lg text-sm font-bold transition" title="Claro" aria-pressed="${t==='light'}">☀</button>
+          <button onclick="applyTheme('sepia'); render()" class="${t==='sepia'?'bg-amb-500 text-white':'text-stone-600'} w-8 h-8 rounded-lg text-sm font-bold transition" title="Sepia" aria-pressed="${t==='sepia'}">⛁</button>
+          <button onclick="applyTheme('dark'); render()" class="${t==='dark'?'bg-stone-800 text-white':'text-stone-600'} w-8 h-8 rounded-lg text-sm font-bold transition" title="Oscuro" aria-pressed="${t==='dark'}">☾</button>
+        </div>`;})()}
+      </div>
+
+      <!-- Partículas decorativas que flotan -->
+      <div class="absolute inset-0 pointer-events-none" aria-hidden="true">
+        <div class="absolute top-[12%] left-[15%] w-2 h-2 rounded-full bg-ind-300/60 breathe-slow"></div>
+        <div class="absolute top-[20%] right-[20%] w-3 h-3 rounded-full bg-mint-500/40 breathe" style="animation-delay:.8s"></div>
+        <div class="absolute top-[30%] left-[70%] w-1.5 h-1.5 rounded-full bg-ind-400/60 breathe" style="animation-delay:1.5s"></div>
+        <div class="absolute top-[55%] left-[10%] w-2 h-2 rounded-full bg-mint-500/50 breathe-slow" style="animation-delay:.3s"></div>
+        <div class="absolute top-[68%] right-[12%] w-2.5 h-2.5 rounded-full bg-ind-300/50 breathe" style="animation-delay:2s"></div>
+      </div>
+
+      <!-- Contenido -->
+      <div class="relative z-10 flex-1 flex flex-col items-center justify-center px-6 pt-24 pb-6 text-center">
+
+        <!-- SVG animado: peso → liviandad -->
+        <div class="relative w-56 h-56 mb-8">
+          <svg viewBox="0 0 200 200" class="w-full h-full">
+            <defs>
+              <radialGradient id="glow" cx="50%" cy="50%" r="50%">
+                <stop offset="0%" stop-color="#A5B4FC" stop-opacity="0.6"/>
+                <stop offset="100%" stop-color="#6366F1" stop-opacity="0"/>
+              </radialGradient>
+              <linearGradient id="circleGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+                <stop offset="0%" stop-color="#6366F1"/>
+                <stop offset="100%" stop-color="#10B981"/>
+              </linearGradient>
+            </defs>
+            <!-- Halo expansivo -->
+            <circle cx="100" cy="100" r="90" fill="url(#glow)" class="breathe-slow" style="transform-origin:100px 100px"/>
+            <!-- Anillo medio -->
+            <circle cx="100" cy="100" r="70" fill="none" stroke="#6366F1" stroke-opacity="0.2" stroke-width="1.5" class="breathe" style="transform-origin:100px 100px;animation-duration:6s"/>
+            <!-- Círculo central -->
+            <circle cx="100" cy="100" r="48" fill="url(#circleGrad)" class="breathe" style="transform-origin:100px 100px;animation-duration:5s">
+            </circle>
+            <!-- Texto S central -->
+            <text x="100" y="100" text-anchor="middle" dominant-baseline="central" font-size="56" font-weight="800" fill="white" font-family="Inter, system-ui, sans-serif">S</text>
+          </svg>
+        </div>
+
+        <!-- Brand -->
+        <h1 class="text-5xl font-extrabold text-ink mb-1 tracking-tight drop-shadow-sm">Soltá</h1>
+        <p class="text-base text-ind-600 font-semibold italic mb-2">Soltá lo que te pesa.</p>
+        <p class="text-sm text-stone-700 max-w-xs mb-10 leading-relaxed">
+          Una app de PNL para transformar emociones, dolor o recuerdos difíciles. <strong class="text-stone-900">5 minutos</strong> guiados, paso a paso.
+        </p>
+
+        <!-- CTAs -->
+        <div class="w-full max-w-sm space-y-3">
+          <button onclick="acceptAndStart()" class="w-full bg-gradient-to-br from-ind-500 to-ind-600 hover:from-ind-600 hover:to-ind-700 text-white py-4 rounded-2xl font-bold text-base shadow-lg shadow-ind-500/30 active:scale-[.98] transition focus-visible:ring-4 focus-visible:ring-ind-200">
+            Empezar ejercicio →
+          </button>
+          <div class="grid grid-cols-2 gap-3">
+            <button onclick="go('sobre')" class="bg-white/80 backdrop-blur hover:bg-white text-ink py-3 rounded-2xl font-semibold text-sm border border-stone-200 active:scale-95 transition focus-visible:ring-2 focus-visible:ring-ind-500">
+              ¿Cómo funciona?
+            </button>
+            <button onclick="go('aviso')" class="bg-white/80 backdrop-blur hover:bg-white text-ink py-3 rounded-2xl font-semibold text-sm border border-stone-200 active:scale-95 transition focus-visible:ring-2 focus-visible:ring-ind-500">
+              Aviso ético
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Footer crisis gate -->
+      <div class="relative z-10 px-5 pb-6 pt-2 text-center">
+        <p class="text-[11px] text-stone-600 leading-relaxed">
+          Si estás en una crisis, llamá al <strong>135</strong> (Argentina, gratis).<br>
+          Esta app NO reemplaza terapia ni atención profesional.
+        </p>
+      </div>
+    </div>
+  `;
+}
+
+// Aceptar disclaimer y arrancar sesión
+function acceptAndStart(){
+  state.acceptedDisclaimer = true;
+  saveState();
+  go('sesion-1');
+}
+
+function ScreenHome(){
+  const last = state.sessions[0];
+  // Detectar tema repetido en últimas 5 sesiones
+  const recent = state.sessions.slice(0,5);
+  const counts = {};
+  recent.forEach(s => { counts[s.category] = (counts[s.category]||0)+1; });
+  const repeated = Object.entries(counts).find(([k,v]) => v >= 3);
+
+  // Calcular racha de días consecutivos
+  function calcStreak(){
+    if(!state.sessions.length) return 0;
+    // Extraer fechas únicas (hoy = índice 0)
+    const today = new Date(); today.setHours(0,0,0,0);
+    const dayMs = 86400000;
+    // Las sesiones tienen date como string localizado — usamos timestamp si existe, si no estimamos
+    // Vamos a usar un approach simple: contar días consecutivos hacia atrás desde hoy
+    // guardando un Set de "día N" donde N = Math.floor((Date.now() - session.ts) / dayMs)
+    // Para eso necesitamos timestamp — si no existe, asumimos que el primero es hoy
+    const days = new Set();
+    state.sessions.forEach((s, i) => {
+      // Estimación: si no hay ts, asumimos que la sesión 0 es hoy, 1 es ayer, etc (simplificado)
+      const d = s.ts ? Math.floor((today.getTime() - s.ts) / dayMs) : i;
+      days.add(d);
+    });
+    let streak = 0;
+    for(let i = 0; i < 365; i++){
+      if(days.has(i)) streak++;
+      else break;
+    }
+    return streak;
+  }
+  const streak = calcStreak();
+
+  return `
+    <div class="screen pb-32">
+      <!-- Brand bar + Selector de tema -->
+      <div class="px-5 pt-7 pb-2 flex items-start justify-between gap-3">
+        <div>
+          <div class="text-3xl font-extrabold text-ink leading-tight">Soltá</div>
+          <div class="text-xs text-ind-600 italic mt-0.5">Soltá lo que te pesa.</div>
+        </div>
+        ${(function(){const t=getTheme();return `
+        <div class="flex gap-1 bg-white/80 backdrop-blur rounded-xl p-1 border border-stone-200 shadow-sm" role="group" aria-label="Esquema de color">
+          <button onclick="applyTheme('light'); render()" class="${t==='light'?'bg-ind-500 text-white':'text-stone-700'} w-8 h-8 rounded-lg text-sm font-bold transition" title="Claro" aria-pressed="${t==='light'}">☀</button>
+          <button onclick="applyTheme('sepia'); render()" class="${t==='sepia'?'bg-amb-500 text-white':'text-stone-700'} w-8 h-8 rounded-lg text-sm font-bold transition" title="Sepia" aria-pressed="${t==='sepia'}">⛁</button>
+          <button onclick="applyTheme('dark'); render()" class="${t==='dark'?'bg-stone-800 text-white':'text-stone-700'} w-8 h-8 rounded-lg text-sm font-bold transition" title="Oscuro" aria-pressed="${t==='dark'}">☾</button>
+        </div>`;})()}
+      </div>
+
+      ${state.draft ? `
+        <div class="mx-5 mt-3 rounded-2xl bg-amb-50 border border-amb-200 p-3 flex items-center gap-3">
+          <div class="text-lg">📝</div>
+          <div class="flex-1 min-w-0">
+            <div class="text-xs font-semibold text-ink">Tenés un ejercicio sin terminar</div>
+            <div class="text-[11px] text-stone-600">${esc(state.draft.titulo || state.draft.category || 'Sesión guardada')}</div>
+          </div>
+          <button onclick="resumeDraft()" class="bg-amb-500 hover:opacity-90 text-white text-xs font-semibold px-3 py-1.5 rounded-lg active:scale-95">Retomar →</button>
+          <button onclick="state.draft=null; saveState(); render()" class="text-stone-500 text-xs px-2" aria-label="Descartar borrador">✕</button>
+        </div>
+      ` : ''}
+
+      <!-- HERO simple, solo CTA -->
+      <div class="mx-5 mt-4 rounded-3xl bg-gradient-to-br from-ind-500 to-ind-600 p-6 shadow-xl shadow-ind-500/20">
+        ${streak >= 2 ? `
+          <div class="flex items-center gap-2 mb-3 bg-white/15 rounded-2xl px-3 py-2">
+            <span class="text-xl">🔥</span>
+            <div>
+              <div class="text-white font-bold text-sm">${streak} días seguidos</div>
+              <div class="text-white/70 text-xs">Seguí así — el cambio se acumula.</div>
+            </div>
+          </div>
+        ` : streak === 1 ? `
+          <div class="flex items-center gap-2 mb-3 bg-white/15 rounded-2xl px-3 py-2">
+            <span class="text-xl">✦</span>
+            <div class="text-white/80 text-xs">Primer día de racha. Volvé mañana.</div>
+          </div>
+        ` : ''}
+        <button onclick="go('sesion-1')" class="w-full bg-white hover:bg-stone-50 text-ind-600 py-4 rounded-2xl font-bold text-base shadow-lg active:scale-[.98] transition">
+          Empezar ejercicio →
+        </button>
+        <div class="flex items-center justify-between mt-4">
+          <span class="text-white/80 text-xs">♪ Música ambient 432Hz</span>
+          <button onclick="state.musicChoice=(state.musicChoice==='yes'?'no':'yes'); saveState(); if(state.musicChoice==='yes'){Audio432.isPlaying()||Audio432.toggle();}else{Audio432.isPlaying()&&Audio432.toggle();} render();"
+            class="flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-semibold transition active:scale-95 ${state.musicChoice==='yes'?'bg-white/20 text-white':'bg-white/10 text-white/60'}">
+            ${state.musicChoice==='yes'?'ON ✓':'OFF'}
+          </button>
+        </div>
+      </div>
+
+      <!-- Recall del ancla anterior -->
+      ${last && last.ancla ? `
+        <div class="mx-5 mt-4 rounded-2xl bg-mint-50 border border-mint-100 p-4">
+          <div class="text-xs text-stone-600 uppercase tracking-wide font-semibold">${esc(last.date)}, anclaste</div>
+          <div class="flex items-baseline gap-2 mt-1">
+            <span class="text-2xl">⚓</span>
+            <div class="text-2xl font-extrabold text-mint-700 italic">"${esc(last.ancla)}"</div>
+          </div>
+          <div class="text-sm text-stone-700 mt-2">¿Cómo estás con eso hoy?</div>
+        </div>
+      ` : ''}
+
+      <!-- Sugerencia inteligente si tema se repite -->
+      ${repeated ? `
+        <div class="mx-5 mt-4 rounded-2xl bg-amb-50 border border-amb-100 p-4">
+          <div class="text-sm font-semibold text-ink mb-1">★ Notamos algo</div>
+          <p class="text-xs text-stone-700 leading-relaxed mb-3">
+            Trabajaste <strong>${repeated[0]}</strong> ${repeated[1]} veces últimamente.
+            A veces, cuando algo vuelve, ayuda hablarlo en una sesión personal.
+          </p>
+          <a href="${WA}" target="_blank" class="inline-block bg-mint-500 hover:opacity-90 text-white text-xs font-semibold px-4 py-2 rounded-xl">
+            Hablemos por WhatsApp →
+          </a>
+        </div>
+      ` : ''}
+
+      <!-- Última sesión -->
+      ${last ? `
+        <div class="mx-5 mt-4 rounded-2xl bg-white p-4 border border-stone-100">
+          <div class="flex items-center justify-between mb-2">
+            <div class="text-xs text-stone-500 uppercase tracking-wide font-semibold">Tu último ejercicio</div>
+            <button onclick="go('diario')" class="text-xs text-ind-600 font-semibold">Ver diario →</button>
+          </div>
+          <div class="text-sm font-semibold text-ink">${esc(last.label)}</div>
+          <div class="text-[11px] text-stone-500 mb-2">${esc(last.date)}${last.category && last.category !== last.label ? ' · ' + esc(last.category) : ''}</div>
+          <div class="flex items-center gap-2 mt-3">
+            <div class="text-coral-500 text-2xl font-bold w-8">${last.before}</div>
+            <div class="flex-1 h-2 bg-stone-200 rounded-full overflow-hidden">
+              <div class="h-full bg-gradient-to-r from-coral-500 to-mint-500" style="width:${Math.max(0,(last.before-last.after)*10)}%"></div>
+            </div>
+            <div class="text-mint-500 text-2xl font-bold w-8 text-right">${last.after}</div>
+          </div>
+          ${(function(){
+            const delta = last.before - last.after;
+            const prev = state.sessions[1];
+            if(prev && prev.category === last.category){
+              const prevDelta = prev.before - prev.after;
+              const diff = delta - prevDelta;
+              if(Math.abs(diff) >= 1){
+                return `<div class="mt-2 text-xs ${diff > 0 ? 'text-mint-700' : 'text-stone-500'}">${diff > 0 ? '↓ Más alivio que la vez anterior.' : '→ Similar a la vez anterior.'} <button onclick="go('diario')" class="underline text-ind-600">Ver evolución</button></div>`;
+              }
+            }
+            if(delta > 0) return `<div class="mt-2 text-xs text-mint-700">Bajaste ${delta} punto${delta===1?'':'s'}. Eso es movimiento.</div>`;
+            return '';
+          })()}
+        </div>
+      ` : ''}
+
+      <!-- Sesiones personales con Jere -->
+      <div class="mx-5 mt-4 rounded-2xl bg-mint-50 border border-mint-100 p-4">
+        <div class="flex items-start gap-3">
+          <div class="w-12 h-12 rounded-full bg-mint-500 flex items-center justify-center text-white font-bold text-lg flex-shrink-0">J</div>
+          <div class="flex-1 min-w-0">
+            <div class="text-sm font-semibold text-ink">Sesiones personales con Jere</div>
+            <div class="text-xs text-stone-700 mt-0.5">Acompañamiento 1 a 1 de Coaching con PNL cuando lo necesites.</div>
+          </div>
+        </div>
+        <div class="grid grid-cols-3 gap-2 mt-3">
+          <a href="${WA}" target="_blank" rel="noopener" class="bg-mint-500 hover:opacity-90 text-white text-[11px] font-semibold text-center py-2.5 rounded-xl active:scale-95 transition">WhatsApp →</a>
+          <a href="${IG}" target="_blank" rel="noopener" class="bg-white hover:bg-stone-50 border border-stone-200 text-stone-700 text-[11px] font-semibold text-center py-2.5 rounded-xl active:scale-95 transition">Instagram →</a>
+          <a href="https://www.jeremiasvargascoach.com" target="_blank" rel="noopener" class="bg-ind-500 hover:opacity-90 text-white text-[11px] font-semibold text-center py-2.5 rounded-xl active:scale-95 transition">Web →</a>
+        </div>
+      </div>
+
+      ${DisclaimerFooter()}
+    </div>
+  `;
+}
+
+function ScreenSesion1(){
+  const cats = [
+    { id:'Emoción difícil', icon:'❤', sub:'ansiedad, miedo, tristeza, enojo', bg:'bg-coral-100' },
+    { id:'Sensación física', icon:'◐', sub:'tensión, opresión, incomodidad', bg:'bg-amb-100' },
+    { id:'Recuerdo molesto', icon:'⤺', sub:'algo del pasado que aún duele', bg:'bg-ind-100' },
+    { id:'Hábito o impulso', icon:'⤻', sub:'algo que querés dejar de hacer', bg:'bg-mint-100' },
+  ];
+  return `
+    <div class="screen pb-32">
+      ${Header({title:'¿Qué te está pesando?', step:1, total:7, showTimer:true, showPause:true})}
+      <div class="px-5">
+        <div class="bg-white rounded-2xl p-5 mb-4 shadow-sm border border-stone-100">
+          <div class="text-sm font-semibold text-ink mb-3">¿Qué tan fuerte lo sentís ahora?</div>
+          <div class="flex items-center gap-4">
+            <input type="range" min="0" max="10" value="${state.intensityBefore}" oninput="state.intensityBefore=parseInt(this.value); document.getElementById('intDisplay').textContent=this.value">
+            <div class="text-4xl font-extrabold text-coral-500 w-12 text-right" id="intDisplay">${state.intensityBefore}</div>
+          </div>
+          <div class="flex justify-between text-[10px] text-stone-400 mt-2 uppercase">
+            <span>bajo</span><span>alto</span>
+          </div>
+        </div>
+
+        <div class="text-sm font-semibold text-ink mb-2 px-1">Elegí qué te gustaría transformar hoy:</div>
+        <div class="grid grid-cols-2 gap-3 mb-4">
+          ${cats.map(c => `
+            <button onclick="state.category='${c.id}'; render()" class="${state.category === c.id ? 'ring-4 ring-ind-500 ring-offset-2' : ''} ${c.bg} p-4 rounded-2xl text-left active:scale-95 transition">
+              <div class="text-2xl mb-2">${c.icon}</div>
+              <div class="text-sm font-bold text-ink">${c.id}</div>
+              <div class="text-[11px] text-stone-600 mt-1">${c.sub}</div>
+            </button>
+          `).join('')}
+        </div>
+
+        ${state.category ? `
+          <div class="bg-white rounded-2xl p-5 shadow-sm border-2 border-ind-200 mb-4">
+            <div class="text-sm font-semibold text-ink mb-1">Ponele un título <span class="text-stone-500 font-normal">(opcional)</span></div>
+            <p class="text-xs text-stone-600 mb-3">Tocá una sugerencia o escribí algo corto. Si querés podés saltarlo.</p>
+            <input id="tituloInput" type="text" maxlength="60" value="${esc(state.titulo||'')}" placeholder="Escribí o tocá una sugerencia..."
+              oninput="state.titulo=this.value"
+              class="w-full bg-stone-50 px-4 py-3 rounded-xl text-base border border-stone-200 focus:outline-none focus:border-ind-500 focus:ring-2 focus:ring-ind-100 mb-3">
+            <div class="flex flex-wrap gap-2">
+              ${(function(){
+                const sugs = {
+                  'Emoción difícil': ['Ansiedad','Miedo','Tristeza','Enojo','Culpa'],
+                  'Sensación física': ['Tensión en el cuello','Opresión en el pecho','Dolor de cabeza'],
+                  'Recuerdo molesto': ['Una discusión','Algo del pasado','Un momento difícil'],
+                  'Hábito o impulso': ['Comer de más','Postergar','Mirar el teléfono']
+                };
+                return (sugs[state.category]||[]).map(s => `
+                  <button onclick="state.titulo='${s}'; var i=document.getElementById('tituloInput'); if(i) i.value='${s}'" class="bg-ind-50 hover:bg-ind-100 border border-ind-200 text-ind-700 text-xs px-3 py-1.5 rounded-full font-medium active:scale-95 transition">${s}</button>
+                `).join('');
+              })()}
+            </div>
+          </div>
+
+          <button onclick="go('sesion-2a')" class="w-full bg-ind-500 hover:bg-ind-600 text-white py-4 rounded-2xl font-semibold shadow-lg active:scale-[.98] transition focus-visible:ring-4 focus-visible:ring-ind-200">
+            Continuar →
+          </button>
+        ` : ''}
+      </div>
+      ${DisclaimerFooter(true)}
+    </div>
+  `;
+}
+
+// Helper: el flujo de Hábito/impulso tiene 8 pasos (agrega pantalla de contexto)
+// Las demás categorías tienen 7. El paso base es para el flujo normal:
+// V=4, A=5, K=6, Transformar=7 → con hábito: V=5, A=6, K=7, Transformar=8
+function flowTotal(){ return state.category === 'Hábito o impulso' ? 8 : 7; }
+function flowStep(baseStep){ return state.category === 'Hábito o impulso' ? baseStep + 1 : baseStep; }
+
+function ScreenSesionMusica(){
+  return `
+    <div class="screen pb-32 min-h-screen flex flex-col">
+      ${Header({title:'¿Querés música de fondo?', step:2, total:7, showTimer:true, showPause:true})}
+      <div class="px-5 flex-1 flex flex-col justify-center">
+        <div class="text-center mb-6">
+          <div class="text-5xl mb-3">♪</div>
+          <h2 class="text-xl font-bold text-ink mb-2">Música ambient en 432 Hz</h2>
+          <p class="text-sm text-stone-700 leading-relaxed">
+            Una progresión de acordes suaves para ayudarte a relajarte durante el ejercicio.
+            Podés ajustarla o pausarla en cualquier momento.
+          </p>
+        </div>
+        <div class="grid grid-cols-2 gap-3">
+          <button onclick="state.musicChoice='no'; saveState(); go('sesion-2a')" class="bg-white border-2 border-stone-200 hover:border-ind-300 text-ink py-4 rounded-2xl font-semibold active:scale-95 transition">
+            En silencio
+          </button>
+          <button onclick="state.musicChoice='yes'; saveState(); Audio432.toggle(); go('sesion-2a')" class="bg-mint-500 hover:opacity-90 text-white py-4 rounded-2xl font-semibold shadow-lg active:scale-95 transition">
+            Sí, con música →
+          </button>
+        </div>
+        ${state.musicChoice ? `<p class="text-center text-[11px] text-stone-500 mt-4">Última vez elegiste: <strong>${state.musicChoice==='yes'?'con música':'silencio'}</strong></p>` : ''}
+      </div>
+      ${DisclaimerFooter(true)}
+    </div>
+  `;
+}
+
+function ScreenSesion2a(){
+  const formatos = [
+    { id:'imagen', icon:'▣', label:'Una imagen', sub:'una foto, una escena, un recuerdo visual' },
+    { id:'metafora', icon:'❀', label:'Una metáfora', sub:'un peso, una tormenta, una sombra, algo simbólico' },
+  ];
+  return `
+    <div class="screen pb-32">
+      ${Header({title:'Hacé silencio interno', step:3, total:7, showTimer:true, showPause:true})}
+      <div class="px-5">
+        <div class="flex flex-col items-center text-center mb-6 pt-2">
+          <div class="mx-auto w-28 h-28 rounded-full bg-ind-100 flex items-center justify-center mb-4">
+            <div class="w-20 h-20 rounded-full bg-ind-500 breathe-slow flex items-center justify-center text-white text-2xl">✦</div>
+          </div>
+          <h2 class="text-xl font-bold text-ink mb-2">Cerrá los ojos un momento</h2>
+          <p class="text-sm text-stone-600 leading-relaxed">
+            Pensá en eso que querés transformar.<br>
+            Inhala, exhala. Sin apuro.<br>
+            <span class="text-stone-400 text-xs mt-1 inline-block">Cuando la tengás, abrí los ojos y elegí.</span>
+          </p>
+        </div>
+
+        <div class="bg-white rounded-2xl p-4 shadow-sm border border-stone-100 mb-3">
+          <div class="text-sm font-semibold text-ink mb-1">¿Cómo apareció?</div>
+          <p class="text-xs text-stone-500 mb-3">Elegí la forma más fuerte. Después podés volver a trabajar las otras.</p>
+          <div class="grid grid-cols-2 gap-3">
+            ${formatos.map(f => `
+              <button onclick="state.formato='${f.id}'; go(${f.id === 'metafora' ? "'sesion-metafora-tipo'" : "'sesion-2c'"})" class="bg-stone-50 border-2 border-stone-200 hover:border-ind-500 active:scale-95 p-4 rounded-2xl text-left transition">
+                <div class="text-2xl mb-2">${f.icon}</div>
+                <div class="text-sm font-bold text-ink">${f.label}</div>
+                <div class="text-[11px] text-stone-500 mt-1">${f.sub}</div>
+              </button>
+            `).join('')}
+          </div>
+        </div>
+      </div>
+      ${DisclaimerFooter(true)}
+    </div>
+  `;
+}
+
+function ScreenSesionMetaforaTipo(){
+  return `
+    <div class="screen pb-32">
+      ${Header({title:'¿Cómo es esa metáfora?', step:3, total:flowTotal(), showTimer:true, showPause:true})}
+      <div class="px-5 pt-4">
+        <div class="bg-ind-50 rounded-2xl p-4 mb-4">
+          <p class="text-sm text-stone-700 leading-relaxed">
+            Las metáforas aparecen de formas distintas. Esto define por dónde empezamos a trabajarla.
+          </p>
+        </div>
+        <div class="space-y-3">
+          <button onclick="state.metaforaTipo='visual'; go('sesion-2c')" class="w-full bg-white border-2 border-stone-200 hover:border-ind-500 active:scale-95 p-4 rounded-2xl text-left transition">
+            <div class="text-xl mb-1">👁</div>
+            <div class="text-sm font-bold text-ink">La veo proyectada afuera</div>
+            <div class="text-xs text-stone-500 mt-1">La imagen aparece en el espacio frente a mí — la tormenta allá, el peso suspendido, la sombra enfrente.</div>
+          </button>
+          <button onclick="state.metaforaTipo='kinestesico'; go('sesion-2c')" class="w-full bg-white border-2 border-stone-200 hover:border-ind-500 active:scale-95 p-4 rounded-2xl text-left transition">
+            <div class="text-xl mb-1">🤲</div>
+            <div class="text-sm font-bold text-ink">La siento dentro del cuerpo</div>
+            <div class="text-xs text-stone-500 mt-1">El nudo en la garganta, el peso en el pecho, la tensión en el estómago — es algo corporal, no una imagen.</div>
+          </button>
+        </div>
+      </div>
+      ${DisclaimerFooter(true)}
+    </div>
+  `;
+}
+
+function ScreenSesion2b(){
+  const formatos = [
+    { id:'imagen', icon:'▣', label:'Una imagen', sub:'algo que veo: una foto, una escena, un recuerdo visual' },
+    { id:'metafora', icon:'❀', label:'Una metáfora', sub:'algo simbólico — un peso, una tormenta, una sombra' },
+  ];
+  return `
+    <div class="screen pb-32">
+      ${Header({title:'¿Qué forma tomó?', step:3, total:7, showTimer:true, showPause:true})}
+      <div class="px-5">
+        <div class="bg-white rounded-2xl p-5 mb-4 shadow-sm border border-stone-100">
+          <p class="text-sm text-stone-700 leading-relaxed">
+            <strong class="text-ink">Necesitás encontrar una representación de "eso".</strong>
+            ¿Qué forma tomó cuando la pensaste?
+          </p>
+        </div>
+
+        <div class="grid grid-cols-2 gap-3">
+          ${formatos.map(f => `
+            <button onclick="state.formato='${f.id}'; go('sesion-2c')" class="bg-white border-2 border-stone-200 hover:border-ind-500 active:scale-95 p-5 rounded-2xl text-left transition">
+              <div class="text-3xl mb-2">${f.icon}</div>
+              <div class="text-sm font-bold text-ink">${f.label}</div>
+              <div class="text-[11px] text-stone-500 mt-1">${f.sub}</div>
+            </button>
+          `).join('')}
+        </div>
+
+        <div class="mt-4 p-3 bg-ind-50 rounded-xl">
+          <p class="text-[11px] text-stone-700 leading-relaxed">
+            ★ Si tenés varias formas a la vez, elegí la más fuerte. Después podés volver y trabajar las otras.
+          </p>
+        </div>
+      </div>
+      ${DisclaimerFooter(true)}
+    </div>
+  `;
+}
+
+function ScreenSesion2c(){
+  return `
+    <div class="screen pb-32">
+      ${Header({title: state.formato === 'metafora' ? 'Dale una forma' : 'Llevala a tu pantalla', step:3, total:7, showTimer:true, showPause:true})}
+      <div class="px-5">
+        <div class="bg-white rounded-2xl p-5 mb-4 shadow-sm">
+          <p class="text-sm text-stone-700 leading-relaxed">
+            ${state.formato === 'metafora'
+              ? `Tu metáfora no necesita una pantalla — ya tiene presencia propia. <strong class="text-ink">Ubicala frente a vos</strong>, a la distancia que aparezca naturalmente. Vos estás acá, ella allá.`
+              : `Imaginá que esa <strong class="text-ink">imagen</strong> está proyectada en una pantalla de cine. Vos estás en la butaca, ella allá adelante.`
+            }
+          </p>
+        </div>
+
+        <div class="bg-gradient-to-b from-stone-900 to-stone-800 rounded-3xl p-6 my-5 relative overflow-hidden">
+          ${state.formato === 'metafora'
+            ? `<div class="absolute top-3 left-1/2 -translate-x-1/2 text-[9px] text-white/40 uppercase tracking-widest">FRENTE A VOS</div>`
+            : `<div class="absolute top-3 left-1/2 -translate-x-1/2 text-[9px] text-white/40 uppercase tracking-widest">PANTALLA</div>`
+          }
+          <div class="flex justify-center my-8">
+            <div class="w-40 h-24 bg-white/10 rounded-xl backdrop-blur breathe flex items-center justify-center">
+              <span class="text-white/80 text-xs italic">tu ${state.formato === 'metafora' ? 'metáfora' : 'imagen'}</span>
+            </div>
+          </div>
+          <div class="text-center text-[10px] text-white/40 mt-2">vos aquí ↓</div>
+        </div>
+
+        <div class="bg-mint-50 rounded-xl p-3 mb-5">
+          <p class="text-xs text-stone-700 leading-relaxed">
+            <strong class="text-mint-700">Observarla desde afuera te da control.</strong>
+            ${state.formato === 'metafora'
+              ? 'No estás dentro de ella, la estás sosteniendo con la mirada — como un observador.'
+              : 'No estás dentro de eso, lo estás observando como espectador.'
+            }
+          </p>
+        </div>
+
+        <button onclick="go(state.category==='Hábito o impulso'?'sesion-habito': state.metaforaTipo==='kinestesico'?'sesion-K-first':'sesion-V')" class="w-full bg-ind-500 hover:bg-ind-600 text-white py-4 rounded-2xl font-semibold shadow-lg active:scale-[.98] transition">
+          ${state.formato === 'metafora' ? 'La tengo ubicada →' : 'Ya la veo en la pantalla →'}
+        </button>
+      </div>
+      ${DisclaimerFooter(true)}
+    </div>
+  `;
+}
+
+/* SLIDER REACTIVO con preview visual */
+function ReactiveSlider({label, leftHint, rightHint, value, key, modality, preview}){
+  return `
+    <div class="bg-white rounded-2xl p-4 shadow-sm border border-stone-100">
+      <div class="flex items-baseline justify-between mb-3">
+        <div class="text-base font-semibold text-ink">${label}</div>
+        <div class="text-2xl font-bold text-ind-500" data-display="${modality}-${key}">${value}</div>
+      </div>
+      <!-- Preview reactivo -->
+      <div class="h-12 rounded-xl mb-3 flex items-center justify-center overflow-hidden bg-stone-100" data-preview="${modality}-${key}">
+        ${preview(value)}
+      </div>
+      <input type="range" min="0" max="100" value="${value}"
+        oninput="state.${modality}.${key}=parseInt(this.value); document.querySelector('[data-display=&quot;${modality}-${key}&quot;]').textContent=this.value; document.querySelector('[data-preview=&quot;${modality}-${key}&quot;]').innerHTML=PREVIEWS['${modality}-${key}'](parseInt(this.value));">
+      <div class="flex justify-between text-[10px] text-stone-400 mt-2 uppercase tracking-wide">
+        <span>${leftHint}</span><span>${rightHint}</span>
+      </div>
+    </div>
+  `;
+}
+
+/* PREVIEWS reactivos */
+const PREVIEWS = {
+  'visual-brillo': (v) => `<div class="w-20 h-8 rounded-lg" style="background:rgba(99,102,241,${0.15 + v/120});box-shadow:0 0 ${v/3}px rgba(99,102,241,${v/100})"></div>`,
+  'visual-distancia': (v) => {
+    const size = 50 - (v/100)*30;
+    return `<div class="rounded-lg bg-ind-500/40 transition-all" style="width:${size}px;height:${size*0.6}px"></div>`;
+  },
+  'visual-tamanio': (v) => {
+    const size = 12 + (v/100)*50;
+    return `<div class="rounded-lg bg-ind-500/50 transition-all" style="width:${size}px;height:${size*0.6}px"></div>`;
+  },
+  'auditivo-volumen': (v) => {
+    const bars = Math.ceil(v/12);
+    let html = '<div class="flex items-end gap-1 h-8">';
+    for(let i=0; i<8; i++){
+      const h = i < bars ? 8 + (i*3) : 4;
+      const op = i < bars ? 1 : 0.2;
+      html += `<div class="w-1.5 bg-ind-500 rounded-sm transition-all" style="height:${h}px;opacity:${op}"></div>`;
+    }
+    html += '</div>';
+    return html;
+  },
+  'auditivo-distancia': (v) => {
+    const offset = (v/100)*60 - 30;
+    return `<div class="text-2xl transition-all" style="transform:translateX(${offset}px) scale(${1.2 - v/200})">♪</div>`;
+  },
+  'kinestesico-peso': (v) => {
+    const drop = (v/100)*8;
+    return `<div class="text-2xl transition-all" style="transform:translateY(${drop}px)">${v < 30 ? '☁' : v < 70 ? '◐' : '⬛'}</div>`;
+  },
+  'kinestesico-intensidad': (v) => {
+    const scale = 0.6 + (v/100)*0.6;
+    return `<div class="rounded-full bg-coral-500/60 transition-all" style="width:${24*scale}px;height:${24*scale}px"></div>`;
+  },
+  'kinestesico-temperatura': (v) => {
+    const color = v < 50 ? `rgba(99,170,255,${0.4 + v/120})` : `rgba(248,113,113,${0.4 + (v-50)/100})`;
+    return `<div class="w-20 h-8 rounded-lg transition-all" style="background:${color}"></div>`;
+  },
+  'kinestesico-textura': (v) => {
+    // Visualiza de suave (blur) a rugoso (patrón puntillado)
+    const density = Math.round(v / 20);
+    let dots = '';
+    for(let i=0; i<density; i++) dots += `<span style="display:inline-block;width:5px;height:5px;border-radius:50%;background:rgba(99,102,241,0.6);margin:1px"></span>`;
+    return `<div class="flex flex-wrap items-center justify-center gap-0.5 h-8">${density === 0 ? '<span style="font-size:11px;color:#94a3b8">suave</span>' : dots}</div>`;
+  },
+};
+
+// Recordatorio sticky de qué se está trabajando
+function StickyContext(){
+  const t = (state.titulo || '').trim() || state.category || 'Tu ejercicio';
+  const f = state.formato === 'metafora' ? 'metáfora' : (state.formato || 'representación');
+  return `
+    <div class="bg-ind-50 border-y border-ind-100 px-5 py-2 text-center">
+      <div class="text-[10px] text-ind-600 uppercase tracking-wide">Trabajando con</div>
+      <div class="text-sm font-semibold text-ink truncate">${esc(t)} · <span class="text-ind-600">${f}</span></div>
+    </div>
+  `;
+}
+
+/* Pantalla adicional solo para Hábito o impulso: contexto de disparador */
+function ScreenSesionHabito(){
+  const esOtro = state.habitoContexto && !['Cuando estoy solo/a','Cuando estoy estresado/a','Cuando estoy aburrido/a','Después de un conflicto'].includes(state.habitoContexto);
+  return `
+    <div class="screen pb-32">
+      ${Header({title:'Tu hábito o impulso', step:4, total:8, showTimer:true, showPause:true})}
+      ${StickyContext()}
+      <div class="px-5 pt-4">
+        <div class="bg-ind-50 rounded-2xl p-4 mb-4">
+          <p class="text-sm text-stone-700 leading-relaxed">
+            Antes de ver cómo lo representás, ayuda entender <strong class="text-ink">cuándo y cómo aparece</strong>.
+          </p>
+        </div>
+
+        <div class="bg-white rounded-2xl p-4 shadow-sm border border-stone-100 mb-3">
+          <div class="text-sm font-semibold text-ink mb-3">¿Cuándo aparece más seguido?</div>
+          <div class="grid grid-cols-2 gap-2">
+            ${['Cuando estoy solo/a','Cuando estoy estresado/a','Cuando estoy aburrido/a','Después de un conflicto'].map(op => `
+              <button onclick="state.habitoContexto='${op}'; render()" class="${state.habitoContexto===op?'bg-ind-500 text-white':'bg-stone-50 text-stone-700 border border-stone-200'} py-2.5 rounded-xl text-xs font-medium active:scale-95 leading-tight p-3">${op}</button>
+            `).join('')}
+            <button onclick="state.habitoContexto='__otro__'; render()" class="${esOtro||state.habitoContexto==='__otro__'?'bg-ind-500 text-white':'bg-stone-50 text-stone-700 border border-stone-200'} py-2.5 rounded-xl text-xs font-medium active:scale-95 leading-tight p-3 col-span-2">Otro — escribilo abajo</button>
+          </div>
+          ${state.habitoContexto === '__otro__' ? `
+          <input type="text" maxlength="80" value="${esc(state.habitoContextoLibre||'')}" placeholder="ej: cuando termino de comer, cuando me aburro en reuniones..."
+            oninput="state.habitoContextoLibre=this.value"
+            class="w-full mt-3 bg-stone-50 px-4 py-3 rounded-xl text-sm border border-stone-200 focus:outline-none focus:border-ind-500 focus:ring-2 focus:ring-ind-100">
+          ` : ''}
+        </div>
+
+        <div class="bg-white rounded-2xl p-4 shadow-sm border border-stone-100 mb-4">
+          <div class="text-sm font-semibold text-ink mb-1">¿Qué lo dispara?</div>
+          <p class="text-xs text-stone-500 mb-2">Opcional. Escribí algo concreto si se te ocurre.</p>
+          <input type="text" maxlength="80" value="${esc(state.habitoDisparador||'')}" placeholder="ej: ver el teléfono, sentirme solo, tener un rato libre..."
+            oninput="state.habitoDisparador=this.value"
+            class="w-full bg-stone-50 px-4 py-3 rounded-xl text-sm border border-stone-200 focus:outline-none focus:border-ind-500 focus:ring-2 focus:ring-ind-100">
+        </div>
+
+        <button onclick="go('sesion-V')" class="w-full bg-ind-500 hover:bg-ind-600 text-white py-4 rounded-2xl font-semibold shadow-lg active:scale-[.98] transition">
+          Continuar →
+        </button>
+      </div>
+      ${DisclaimerFooter(true)}
+    </div>
+  `;
+}
+
+function ScreenSesionV(){
+  const v = state.visual;
+  const adv = !!state.showAdvanced;
+  return `
+    <div class="screen pb-32">
+      ${Header({title:'Cómo se ve', step:flowStep(4), total:flowTotal(), showTimer:true, showPause:true})}
+      ${StickyContext()}
+      <div class="px-5 pt-4">
+        <div class="bg-ind-50 rounded-2xl p-4 mb-4">
+          <div class="text-[10px] uppercase tracking-widest text-ind-600 font-bold mb-1.5">CÓMO SE VE</div>
+          <p class="text-sm text-stone-700 leading-relaxed">
+            Pensá en cómo apareció esa <strong>${state.formato === 'metafora' ? 'metáfora' : 'imagen'}</strong> en tu mente y marcá lo que vas notando.
+          </p>
+        </div>
+
+        <div class="space-y-3">
+          ${ReactiveSlider({label:'Brillo', leftHint:'oscuro', rightHint:'brillante', value:v.brillo, key:'brillo', modality:'visual', preview:PREVIEWS['visual-brillo']})}
+          ${ReactiveSlider({label:'Distancia', leftHint:'cerca', rightHint:'lejos', value:v.distancia, key:'distancia', modality:'visual', preview:PREVIEWS['visual-distancia']})}
+          ${ReactiveSlider({label:'Tamaño', leftHint:'chica', rightHint:'enorme', value:v.tamanio, key:'tamanio', modality:'visual', preview:PREVIEWS['visual-tamanio']})}
+        </div>
+
+        <!-- Asociado/Disociado: submodalidad clave — siempre visible -->
+        <div class="bg-white rounded-2xl p-4 shadow-sm border border-stone-100 mt-3">
+          <div class="text-sm font-semibold text-ink mb-1">¿Cómo la ves?</div>
+          <p class="text-xs text-stone-500 mb-3">Esto influye bastante en la intensidad emocional.</p>
+          <div class="grid grid-cols-2 gap-2">
+            <button onclick="state.visual.asociado='asociado'; render()" class="${v.asociado==='asociado'?'bg-ind-500 text-white':'bg-stone-50 text-stone-700 border border-stone-200'} py-3 rounded-xl text-xs font-medium leading-tight active:scale-95">Con tus ojos<br><span class="opacity-60">(asociado)</span></button>
+            <button onclick="state.visual.asociado='disociado'; render()" class="${v.asociado==='disociado'?'bg-ind-500 text-white':'bg-stone-50 text-stone-700 border border-stone-200'} py-3 rounded-xl text-xs font-medium leading-tight active:scale-95">Te ves a vos<br><span class="opacity-60">(disociado)</span></button>
+          </div>
+        </div>
+
+        <button onclick="state.showAdvanced=!state.showAdvanced; render()" class="w-full mt-4 bg-stone-100 hover:bg-stone-200 text-stone-700 py-3 rounded-xl text-sm font-semibold active:scale-[.98] transition flex items-center justify-center gap-2">
+          ${adv ? '▲ Ocultar opciones avanzadas' : '▼ Más detalles (foco, ubicación, marco, movimiento)'}
+        </button>
+
+        ${adv ? `
+        <div class="space-y-3 mt-3">
+          <div class="bg-white rounded-2xl p-4 shadow-sm border border-stone-100">
+            <div class="text-sm font-semibold text-ink mb-3">Color</div>
+            <div class="grid grid-cols-4 gap-2">
+              ${['B&N','Sepia','Suave','Vívido'].map((c,i) => `
+                <button onclick="state.visual.color=${i}; render()" class="${v.color===i?'bg-ind-500 text-white':'bg-stone-50 text-stone-700 border border-stone-200'} py-2.5 rounded-xl text-xs font-medium active:scale-95">${c}</button>
+              `).join('')}
+            </div>
+          </div>
+          <div class="bg-white rounded-2xl p-4 shadow-sm border border-stone-100">
+            <div class="text-sm font-semibold text-ink mb-1">Foco</div>
+            <p class="text-xs text-stone-500 mb-3">¿La imagen es nítida o borrosa?</p>
+            <div class="grid grid-cols-2 gap-2">
+              <button onclick="state.visual.foco='nitida'; render()" class="${v.foco==='nitida'?'bg-ind-500 text-white':'bg-stone-50 text-stone-700 border border-stone-200'} py-3 rounded-xl text-xs font-medium active:scale-95 leading-tight">Nítida<br><span class="opacity-60">clara y definida</span></button>
+              <button onclick="state.visual.foco='borrosa'; render()" class="${v.foco==='borrosa'?'bg-ind-500 text-white':'bg-stone-50 text-stone-700 border border-stone-200'} py-3 rounded-xl text-xs font-medium active:scale-95 leading-tight">Borrosa<br><span class="opacity-60">difusa, sin foco</span></button>
+            </div>
+          </div>
+          <div class="bg-white rounded-2xl p-4 shadow-sm border border-stone-100">
+            <div class="text-sm font-semibold text-ink mb-1">Ubicación</div>
+            <p class="text-xs text-stone-500 mb-3">¿Dónde aparece en tu campo visual interno?</p>
+            <div class="grid grid-cols-3 gap-2">
+              ${[['Frente','adelante'],['Izquierda','costado izq.'],['Derecha','costado der.'],['Arriba','arriba'],['Abajo','abajo'],['Atrás','detrás de vos']].map(([label,sub],i) => `
+                <button onclick="state.visual.ubicacion=${i}; render()" class="${v.ubicacion===i?'bg-ind-500 text-white':'bg-stone-50 text-stone-700 border border-stone-200'} py-2.5 rounded-xl text-xs font-medium active:scale-95 leading-tight">${label}<br><span class="opacity-60 text-[10px]">${sub}</span></button>
+              `).join('')}
+            </div>
+          </div>
+          <div class="bg-white rounded-2xl p-4 shadow-sm border border-stone-100">
+            <div class="text-sm font-semibold text-ink mb-1">Marco</div>
+            <p class="text-xs text-stone-500 mb-3">¿Tiene un borde definido o se expande sin límites?</p>
+            <div class="grid grid-cols-2 gap-2">
+              <button onclick="state.visual.marco='con'; render()" class="${v.marco==='con'?'bg-ind-500 text-white':'bg-stone-50 text-stone-700 border border-stone-200'} py-3 rounded-xl text-xs font-medium active:scale-95 leading-tight">Con marco<br><span class="opacity-60">tiene un borde claro</span></button>
+              <button onclick="state.visual.marco='sin'; render()" class="${v.marco==='sin'?'bg-ind-500 text-white':'bg-stone-50 text-stone-700 border border-stone-200'} py-3 rounded-xl text-xs font-medium active:scale-95 leading-tight">Sin marco<br><span class="opacity-60">panorámica, sin límites</span></button>
+            </div>
+          </div>
+          <div class="bg-white rounded-2xl p-4 shadow-sm border border-stone-100">
+            <div class="text-sm font-semibold text-ink mb-3">¿Estática o con movimiento?</div>
+            <div class="grid grid-cols-2 gap-2">
+              <button onclick="state.visual.movimiento='estatica'; render()" class="${v.movimiento==='estatica'?'bg-ind-500 text-white':'bg-stone-50 text-stone-700 border border-stone-200'} py-3 rounded-xl text-xs font-medium leading-tight active:scale-95">Estática<br><span class="opacity-60">como una foto</span></button>
+              <button onclick="state.visual.movimiento='movimiento'; render()" class="${v.movimiento==='movimiento'?'bg-ind-500 text-white':'bg-stone-50 text-stone-700 border border-stone-200'} py-3 rounded-xl text-xs font-medium leading-tight active:scale-95">En movimiento<br><span class="opacity-60">como una película</span></button>
+            </div>
+          </div>
+          ${v.movimiento === 'movimiento' ? `
+          <div class="bg-white rounded-2xl p-4 shadow-sm border border-stone-100">
+            <div class="text-sm font-semibold text-ink mb-3">Velocidad del movimiento</div>
+            <div class="grid grid-cols-3 gap-2">
+              ${[['Lenta',''],['Media',''],['Rápida','']].map(([label],i) => `
+                <button onclick="state.visual.velocidad=${i}; render()" class="${v.velocidad===i?'bg-ind-500 text-white':'bg-stone-50 text-stone-700 border border-stone-200'} py-2.5 rounded-xl text-xs font-medium active:scale-95">${label}</button>
+              `).join('')}
+            </div>
+          </div>
+          ` : ''}
+        </div>
+        ` : ''}
+
+        <button onclick="
+          if(state.metaforaTipo==='kinestesico'){
+            state.modIndex=0; state.modificaciones=[]; go('sesion-7');
+          } else { go('sesion-A'); }
+        " class="w-full bg-ind-500 hover:bg-ind-600 text-white py-4 rounded-2xl font-semibold shadow-lg active:scale-[.98] transition mt-5">
+          ${state.metaforaTipo==='kinestesico' ? 'Vamos a transformar →' : 'Siguiente: sonidos →'}
+        </button>
+      </div>
+      ${DisclaimerFooter(true)}
+    </div>
+  `;
+}
+
+function ScreenSesionA(){
+  const a = state.auditivo;
+  const adv = !!state.showAdvancedA;
+  return `
+    <div class="screen pb-32">
+      ${Header({title:'Qué se escucha', step:flowStep(5), total:flowTotal(), showTimer:true, showPause:true})}
+      ${StickyContext()}
+      <div class="px-5 pt-4">
+        <div class="bg-ind-50 rounded-2xl p-4 mb-4">
+          <div class="text-[10px] uppercase tracking-widest text-ind-600 font-bold mb-1.5">QUÉ SE ESCUCHA</div>
+          <p class="text-sm text-stone-700 leading-relaxed">
+            ¿Esa <strong>${state.formato === 'metafora' ? 'metáfora' : 'imagen'}</strong> que apareció trae algún sonido?
+            Pueden ser voces, ruidos, música, o estar en silencio total.
+          </p>
+        </div>
+
+        <div class="bg-white rounded-2xl p-4 shadow-sm border border-stone-100 mb-3">
+          <div class="text-base font-semibold text-ink mb-3">¿Hay sonido en la representación?</div>
+          <div class="grid grid-cols-2 gap-2">
+            <button onclick="state.auditivo.hay='si'; render()" class="${a.hay==='si'?'bg-ind-500 text-white':'bg-stone-50 text-stone-700 border border-stone-200'} py-3.5 rounded-xl text-sm font-medium active:scale-95">Sí, hay sonido</button>
+            <button onclick="state.auditivo.hay='no'; render()" class="${a.hay==='no'?'bg-ind-500 text-white':'bg-stone-50 text-stone-700 border border-stone-200'} py-3.5 rounded-xl text-sm font-medium active:scale-95">Está en silencio</button>
+          </div>
+        </div>
+
+        ${a.hay === 'si' ? `
+          <div class="space-y-3">
+            ${ReactiveSlider({label:'Volumen', leftHint:'bajo', rightHint:'fuerte', value:a.volumen, key:'volumen', modality:'auditivo', preview:PREVIEWS['auditivo-volumen']})}
+            ${ReactiveSlider({label:'Distancia', leftHint:'cerca', rightHint:'lejos', value:a.distancia, key:'distancia', modality:'auditivo', preview:PREVIEWS['auditivo-distancia']})}
+          </div>
+
+          <button onclick="state.showAdvancedA=!state.showAdvancedA; render()" class="w-full mt-4 bg-stone-100 hover:bg-stone-200 text-stone-700 py-3 rounded-xl text-sm font-semibold active:scale-[.98] transition flex items-center justify-center gap-2">
+            ${adv ? '▲ Ocultar opciones avanzadas' : '▼ Más detalles (tono, ritmo, voz)'}
+          </button>
+
+          ${adv ? `
+          <div class="space-y-3 mt-3">
+            <div class="bg-white rounded-2xl p-4 shadow-sm border border-stone-100">
+              <div class="text-sm font-semibold text-ink mb-3">Tono</div>
+              <div class="grid grid-cols-3 gap-2">
+                ${[['Grave','♩'],['Medio','♪'],['Agudo','♫']].map(([label,icon],i) => `
+                  <button onclick="state.auditivo.tono=${i}; render()" class="${a.tono===i?'bg-ind-500 text-white':'bg-stone-50 text-stone-700 border border-stone-200'} py-2.5 rounded-xl text-xs font-medium active:scale-95 leading-tight">${icon}<br>${label}</button>
+                `).join('')}
+              </div>
+            </div>
+            <div class="bg-white rounded-2xl p-4 shadow-sm border border-stone-100">
+              <div class="text-sm font-semibold text-ink mb-3">Ritmo</div>
+              <div class="grid grid-cols-2 gap-2">
+                ${[['Continuo','como un zumbido o tono sostenido'],['Intermitente','aparece y desaparece']].map(([label,sub],i) => `
+                  <button onclick="state.auditivo.ritmo=${i}; render()" class="${a.ritmo===i?'bg-ind-500 text-white':'bg-stone-50 text-stone-700 border border-stone-200'} py-3 rounded-xl text-xs font-medium active:scale-95 text-left px-3 leading-tight">${label}<br><span class="opacity-60 text-[10px]">${sub}</span></button>
+                `).join('')}
+              </div>
+            </div>
+            <div class="bg-white rounded-2xl p-4 shadow-sm border border-stone-100">
+              <div class="text-sm font-semibold text-ink mb-1">¿Es una voz?</div>
+              <p class="text-xs text-stone-500 mb-3">Si hay voces, esto influye mucho en la carga emocional.</p>
+              <div class="grid grid-cols-3 gap-2">
+                ${[['No es voz',''],['Voz propia','la tuya'],['Voz ajena','de otro']].map(([label,sub],i) => `
+                  <button onclick="state.auditivo.voz=${i}; render()" class="${a.voz===i?'bg-ind-500 text-white':'bg-stone-50 text-stone-700 border border-stone-200'} py-3 rounded-xl text-xs font-medium active:scale-95 leading-tight">${label}${sub?`<br><span class="opacity-60 text-[10px]">${sub}</span>`:''}</button>
+                `).join('')}
+              </div>
+              ${a.voz === 1 ? `<p class="text-xs text-mint-700 mt-2 bg-mint-50 rounded-lg px-3 py-2">Cuando la voz es tuya, podés cambiar el tono (más suave, desde afuera) y eso cambia todo.</p>` : ''}
+              ${a.voz === 2 ? `<p class="text-xs text-mint-700 mt-2 bg-mint-50 rounded-lg px-3 py-2">Una voz ajena se puede alejar, bajar el volumen, o transformar en algo neutro.</p>` : ''}
+            </div>
+          </div>
+          <div class="bg-white rounded-2xl p-4 shadow-sm border border-stone-100">
+            <div class="text-sm font-semibold text-ink mb-1">Velocidad</div>
+            <p class="text-xs text-stone-500 mb-3">¿Se escucha rápido o lento?</p>
+            <div class="grid grid-cols-2 gap-2">
+              <button onclick="state.auditivo.velocidad='lenta'; render()" class="${a.velocidad==='lenta'?'bg-ind-500 text-white':'bg-stone-50 text-stone-700 border border-stone-200'} py-3 rounded-xl text-xs font-medium active:scale-95 leading-tight">Lenta<br><span class="opacity-60">pausado, arrastrado</span></button>
+              <button onclick="state.auditivo.velocidad='rapida'; render()" class="${a.velocidad==='rapida'?'bg-ind-500 text-white':'bg-stone-50 text-stone-700 border border-stone-200'} py-3 rounded-xl text-xs font-medium active:scale-95 leading-tight">Rápida<br><span class="opacity-60">acelerado, urgente</span></button>
+            </div>
+          </div>
+          <div class="bg-white rounded-2xl p-4 shadow-sm border border-stone-100">
+            <div class="text-sm font-semibold text-ink mb-1">Ubicación del sonido</div>
+            <p class="text-xs text-stone-500 mb-3">¿De dónde viene?</p>
+            <div class="grid grid-cols-2 gap-2">
+              ${[['Izquierda',''],['Derecha',''],['Adelante','frente a vos'],['Detrás','desde atrás'],['Interno','dentro de tu cabeza'],['Externo','viene de afuera']].map(([label,sub],i) => `
+                <button onclick="state.auditivo.ubicacion=${i}; render()" class="${a.ubicacion===i?'bg-ind-500 text-white':'bg-stone-50 text-stone-700 border border-stone-200'} py-2.5 rounded-xl text-xs font-medium active:scale-95 leading-tight text-left px-3">${label}${sub?`<br><span class="opacity-60 text-[10px]">${sub}</span>`:''}</button>
+              `).join('')}
+            </div>
+          </div>
+          <div class="bg-white rounded-2xl p-4 shadow-sm border border-stone-100">
+            <div class="text-sm font-semibold text-ink mb-1">Timbre</div>
+            <p class="text-xs text-stone-500 mb-3">¿Tiene alguna característica particular?</p>
+            <div class="grid grid-cols-3 gap-2">
+              ${[['Penetrante',''],['Susurrante',''],['Murmullos','']].map(([label],i) => `
+                <button onclick="state.auditivo.timbre=${i}; render()" class="${a.timbre===i?'bg-ind-500 text-white':'bg-stone-50 text-stone-700 border border-stone-200'} py-2.5 rounded-xl text-xs font-medium active:scale-95">${label}</button>
+              `).join('')}
+            </div>
+          </div>
+          ` : ''}
+        ` : `
+          <div class="bg-stone-50 rounded-2xl p-6 text-center">
+            <div class="text-3xl mb-2">∅</div>
+            <p class="text-sm text-stone-600">Anotamos: silencio.<br>Pasamos a las sensaciones del cuerpo.</p>
+          </div>
+        `}
+
+        <button onclick="go(state.metaforaTipo==='kinestesico'?'sesion-V':'sesion-K')" class="w-full bg-ind-500 hover:bg-ind-600 text-white py-4 rounded-2xl font-semibold shadow-lg active:scale-[.98] transition mt-5">
+          ${state.metaforaTipo==='kinestesico' ? 'Siguiente: cómo se ve →' : 'Siguiente: cuerpo →'}
+        </button>
+      </div>
+      ${DisclaimerFooter(true)}
+    </div>
+  `;
+}
+
+function ScreenSesionK(){
+  const k = state.kinestesico;
+  const zonas = ['cabeza','garganta','pecho','estómago','espalda','piernas'];
+  const adv = !!state.showAdvancedK;
+  return `
+    <div class="screen pb-32">
+      ${Header({title:'Qué sentís en el cuerpo', step:flowStep(6), total:flowTotal(), showTimer:true, showPause:true})}
+      ${StickyContext()}
+      <div class="px-5 pt-4">
+        <div class="bg-ind-50 rounded-2xl p-4 mb-4">
+          <div class="text-[10px] uppercase tracking-widest text-ind-600 font-bold mb-1.5">QUÉ SENTÍS EN EL CUERPO</div>
+          <p class="text-sm text-stone-700 leading-relaxed">
+            Cuando aparece esa <strong>${state.formato === 'metafora' ? 'metáfora' : 'imagen'}</strong>,
+            ¿qué sensación física te genera y dónde la sentís?
+          </p>
+        </div>
+
+        <div class="space-y-3">
+          ${ReactiveSlider({label:'Peso', leftHint:'liviano', rightHint:'pesado', value:k.peso, key:'peso', modality:'kinestesico', preview:PREVIEWS['kinestesico-peso']})}
+          ${ReactiveSlider({label:'Intensidad', leftHint:'débil', rightHint:'fuerte', value:k.intensidad, key:'intensidad', modality:'kinestesico', preview:PREVIEWS['kinestesico-intensidad']})}
+          ${ReactiveSlider({label:'Temperatura', leftHint:'fría ❄', rightHint:'caliente ☀', value:k.temperatura, key:'temperatura', modality:'kinestesico', preview:PREVIEWS['kinestesico-temperatura']})}
+
+          <div class="bg-white rounded-2xl p-4 shadow-sm border border-stone-100">
+            <div class="text-base font-semibold text-ink mb-3">¿Dónde lo sentís?</div>
+            <div class="grid grid-cols-3 gap-2">
+              ${zonas.map(z => `
+                <button onclick="state.kinestesico.ubicacion='${z}'; render()" class="${k.ubicacion===z?'bg-ind-500 text-white':'bg-stone-50 text-stone-700 border border-stone-200'} py-2.5 rounded-xl text-xs font-medium capitalize active:scale-95">${z}</button>
+              `).join('')}
+            </div>
+          </div>
+        </div>
+
+        <button onclick="state.showAdvancedK=!state.showAdvancedK; render()" class="w-full mt-4 bg-stone-100 hover:bg-stone-200 text-stone-700 py-3 rounded-xl text-sm font-semibold active:scale-[.98] transition flex items-center justify-center gap-2">
+          ${adv ? '▲ Ocultar opciones avanzadas' : '▼ Más detalles (textura, movimiento, ritmo)'}
+        </button>
+
+        ${adv ? `
+        <div class="space-y-3 mt-3">
+          <div class="bg-white rounded-2xl p-4 shadow-sm border border-stone-100">
+            <div class="text-sm font-semibold text-ink mb-3">Textura</div>
+            <div class="grid grid-cols-4 gap-2">
+              ${[['Lisa',''],['Rugosa',''],['Punzante',''],['Difusa','']].map(([label],i) => `
+                <button onclick="state.kinestesico.textura=${i}; render()" class="${k.textura===i?'bg-ind-500 text-white':'bg-stone-50 text-stone-700 border border-stone-200'} py-2.5 rounded-xl text-xs font-medium active:scale-95">${label}</button>
+              `).join('')}
+            </div>
+          </div>
+          <div class="bg-white rounded-2xl p-4 shadow-sm border border-stone-100">
+            <div class="text-sm font-semibold text-ink mb-3">¿Tiene movimiento interno?</div>
+            <div class="grid grid-cols-2 gap-2">
+              ${[['Estática','está quieta, fija'],['En movimiento','vibra, pulsa, fluye']].map(([label,sub],i) => `
+                <button onclick="state.kinestesico.movimiento=${i}; render()" class="${k.movimiento===i?'bg-ind-500 text-white':'bg-stone-50 text-stone-700 border border-stone-200'} py-3 rounded-xl text-xs font-medium active:scale-95 leading-tight text-left px-3">${label}<br><span class="opacity-60 text-[10px]">${sub}</span></button>
+              `).join('')}
+            </div>
+          </div>
+          ${k.movimiento === 1 ? `
+          <div class="bg-white rounded-2xl p-4 shadow-sm border border-stone-100">
+            <div class="text-sm font-semibold text-ink mb-3">Ritmo del movimiento</div>
+            <div class="grid grid-cols-3 gap-2">
+              ${[['Lento',''],['Medio',''],['Rápido','']].map(([label],i) => `
+                <button onclick="state.kinestesico.ritmo=${i}; render()" class="${k.ritmo===i?'bg-ind-500 text-white':'bg-stone-50 text-stone-700 border border-stone-200'} py-2.5 rounded-xl text-xs font-medium active:scale-95">${label}</button>
+              `).join('')}
+            </div>
+          </div>
+          ` : ''}
+          <div class="bg-white rounded-2xl p-4 shadow-sm border border-stone-100">
+            <div class="text-sm font-semibold text-ink mb-1">Tensión</div>
+            <p class="text-xs text-stone-500 mb-3">¿Hay tensión muscular asociada a esa sensación?</p>
+            <div class="grid grid-cols-3 gap-2">
+              ${[['Tirante','contraída, tensa'],['Floja','suelta, lánguida'],['Relajada','cómoda, sin tensión']].map(([label,sub],i) => `
+                <button onclick="state.kinestesico.tension=${i}; render()" class="${k.tension===i?'bg-ind-500 text-white':'bg-stone-50 text-stone-700 border border-stone-200'} py-3 rounded-xl text-xs font-medium active:scale-95 leading-tight">${label}<br><span class="opacity-60 text-[10px]">${sub}</span></button>
+              `).join('')}
+            </div>
+          </div>
+          <div class="bg-white rounded-2xl p-4 shadow-sm border border-stone-100">
+            <div class="text-sm font-semibold text-ink mb-1">Profundidad</div>
+            <p class="text-xs text-stone-500 mb-3">¿Dónde está ubicada en tu cuerpo?</p>
+            <div class="grid grid-cols-2 gap-2">
+              ${[['En la superficie','en la piel, borde del cuerpo'],['En profundidad','adentro, en el interior'],['Dentro del cuerpo','órganos, huesos, centro'],['Fuera del cuerpo','alrededor de vos']].map(([label,sub],i) => `
+                <button onclick="state.kinestesico.profundidad=${i}; render()" class="${k.profundidad===i?'bg-ind-500 text-white':'bg-stone-50 text-stone-700 border border-stone-200'} py-3 rounded-xl text-xs font-medium active:scale-95 leading-tight text-left px-3">${label}<br><span class="opacity-60 text-[10px]">${sub}</span></button>
+              `).join('')}
+            </div>
+          </div>
+          <div class="bg-mint-50 rounded-xl p-3 border border-mint-100">
+            <p class="text-xs text-stone-700 leading-relaxed">
+              <strong class="text-mint-700">Tip PNL:</strong> El movimiento interno de una sensación es una submodalidad muy poderosa. Si la sensación se mueve, cambiar la dirección o velocidad del movimiento puede reducir la intensidad rápidamente.
+            </p>
+          </div>
+        </div>
+        ` : ''}
+
+        <button onclick="
+          if(state.metaforaTipo==='kinestesico' && state.screen==='sesion-K-first'){
+            go('sesion-A');
+          } else {
+            state.modIndex=0; state.modificaciones=[]; go('sesion-7');
+          }
+        " class="w-full bg-ind-500 hover:bg-ind-600 text-white py-4 rounded-2xl font-semibold shadow-lg active:scale-[.98] transition mt-5">
+          ${(state.metaforaTipo==='kinestesico' && state.screen==='sesion-K-first') ? 'Siguiente: sonidos →' : 'Vamos a transformar →'}
+        </button>
+      </div>
+      ${DisclaimerFooter(true)}
+    </div>
+  `;
+}
+
+/* ============================================================
+   TRANSFORMACIÓN — STEPPER (una sugerencia a la vez)
+============================================================ */
+function buildSuggestions(){
+  const s = [];
+  const v = state.visual;
+  const a = state.auditivo;
+  const k = state.kinestesico;
+  const UMBRAL = 15;
+  const lejosDel50 = (val) => val !== null && val !== undefined && Math.abs(val - 50) >= UMBRAL;
+
+  // — SM CLAVE PERSONAL: si el usuario tiene historial, esa SM va primera —
+  // Buscar la SM clave más frecuente en las últimas 5 sesiones
+  const smKlavePrev = (function(){
+    const recientes = state.sessions.slice(0,5).filter(s => s.smClave);
+    if(!recientes.length) return null;
+    const freq = {};
+    recientes.forEach(s => { freq[s.smClave.mod] = (freq[s.smClave.mod]||0)+1; });
+    const top = Object.entries(freq).sort((a,b)=>b[1]-a[1])[0];
+    return top ? recientes.find(s => s.smClave.mod === top[0])?.smClave : null;
+  })();
+
+  // — VISUAL básico —
+  // Brillo alto → bajar (el brillo alto intensifica). Brillo bajo → ya redujo, no sugerir subir.
+  if(lejosDel50(v.brillo) && v.brillo > 50)
+    s.push({ mod:'Bajá el brillo', side:'V', detail:'Está muy iluminada — hacela más oscura y apagada, como si le bajaras la luz lentamente. El brillo le da más fuerza a la imagen.' });
+
+  // Distancia cerca → alejar (lejos = menos impacto). Si ya está lejos, no sugerir acercar.
+  if(lejosDel50(v.distancia) && v.distancia < 50)
+    s.push({ mod:'Alejá la imagen', side:'V', detail:'Está cerca — llevala al fondo de tu mente, cada vez más lejos, hasta que sea un punto pequeño en la distancia.' });
+
+  // Tamaño grande → achicar. Si ya es chica, no sugerir agrandar.
+  if(lejosDel50(v.tamanio) && v.tamanio > 50)
+    s.push({ mod:'Achicá la imagen', side:'V', detail:'Es grande — reducila hasta que sea pequeña, casi un sello postal en la distancia.' });
+
+  // — VISUAL avanzado —
+  // Color: B&N o Sepia → agregarle color o hacerla más vívida aumenta presencia; Vívido → suavizar reduce.
+  if(v.color !== null && v.color !== undefined){
+    if(v.color === 3) // vívido → suavizar
+      s.push({ mod:'Suavizá los colores', side:'V', detail:'Está muy vívida — bajá la saturación, que sea más suave, más apagada. Los colores fuertes amplifican la emoción.' });
+    else if(v.color === 0) // B&N → agregarle color puede ayudar a integrar (técnica Andreas)
+      s.push({ mod:'Agregale color', side:'V', detail:'Está en blanco y negro — a veces darle color ayuda a integrar la experiencia y hacerla menos disociada y fría.' });
+  }
+
+  // Movimiento: imagen en movimiento → congelarla suele reducir intensidad
+  if(v.movimiento === 'movimiento')
+    s.push({ mod:'Congelá la imagen', side:'V', detail:'Se mueve — pausala, convertila en una foto estática. El movimiento la mantiene viva; quieta pierde fuerza.' });
+
+  // Asociado → disociar siempre reduce intensidad (protocolo de pantalla de cine)
+  if(v.asociado === 'asociado')
+    s.push({ mod:'Disociarte de la escena', side:'V', detail:'Estás adentro de la imagen — salí, mirala desde afuera, viéndote a vos mismo como en una película. La distancia emocional reduce el impacto.' });
+
+  // Foco nítido → desenfocar reduce intensidad. Borroso ya está reducido.
+  if(v.foco === 'nitida')
+    s.push({ mod:'Desenfocá la imagen', side:'V', detail:'Está muy nítida y clara — ponela borrosa, que los bordes se disuelvan. La nitidez le da intensidad; el desenfoque la relaja.' });
+
+  // Sin marco → enmarcarlo la contiene y reduce su fuerza expansiva
+  if(v.marco === 'sin')
+    s.push({ mod:'Poné un marco a la imagen', side:'V', detail:'No tiene límites, se expande — enmarcala como si fuera una foto. El marco la contiene y le quita presencia expansiva.' });
+
+  // Velocidad rápida → frenar reduce urgencia. Lenta ya está reducida.
+  if(v.movimiento === 'movimiento' && v.velocidad === 2)
+    s.push({ mod:'Frenala en cámara lenta', side:'V', detail:'Se mueve rápido — reducí la velocidad al mínimo, que sea casi una diapositiva. La velocidad alta genera urgencia.' });
+
+  // — AUDITIVO —
+  if(a.hay === 'si'){
+    // Volumen fuerte → bajar. Bajo ya está reducido.
+    if(lejosDel50(a.volumen) && a.volumen > 50)
+      s.push({ mod:'Bajá el volumen', side:'A', detail:'Está fuerte — bajá ese sonido casi hasta el silencio. El volumen alto amplifica la carga emocional.' });
+
+    // Distancia cerca → alejar. Lejos ya está reducido.
+    if(lejosDel50(a.distancia) && a.distancia < 50)
+      s.push({ mod:'Alejá el sonido', side:'A', detail:'Está cerca — empujalo hacia atrás, que suene desde lejos, como si viniera de otra habitación.' });
+
+    // Tono agudo → graves son más neutros y menos alertantes
+    if(a.tono === 2)
+      s.push({ mod:'Bajá el tono del sonido', side:'A', detail:'Es agudo — hacelo más grave, más suave, menos penetrante. Los tonos agudos activan el sistema de alerta.' });
+
+    // Ritmo continuo → fragmentar da descanso
+    if(a.ritmo === 0)
+      s.push({ mod:'Fragmentá el sonido', side:'A', detail:'Es continuo, no para — interrumpilo, convertilo en algo intermitente. Los silencios entre medio le quitan presión.' });
+
+    // Voz propia → cambiar el tono hacia más suave
+    if(a.voz === 1)
+      s.push({ mod:'Cambiá el tono de tu voz interna', side:'A', detail:'Es tu propia voz — escucháte diciendo lo mismo pero en un tono más suave, más tranquilo, como si le hablaras a alguien que querés.' });
+    // Voz ajena → alejar y bajar
+    else if(a.voz === 2)
+      s.push({ mod:'Alejá esa voz y bajá el volumen', side:'A', detail:'Es la voz de otro — empujala lejos, bajá el volumen, hasta que sea un murmullo lejano e inofensivo.' });
+
+    // Velocidad rápida → frenar
+    if(a.velocidad === 'rapida')
+      s.push({ mod:'Frenalo — que suene más lento', side:'A', detail:'Va rápido — reducí la velocidad, que se escuche pausado, con espacio entre las palabras o los sonidos.' });
+
+    // Timbre penetrante → suavizar
+    if(a.timbre === 0)
+      s.push({ mod:'Suavizá el timbre', side:'A', detail:'Es penetrante — convertilo en un susurro suave, que pierda esa fuerza cortante.' });
+
+    // Ubicación interno → externalizar reduce la sensación de que "viene de adentro"
+    if(a.ubicacion === 4)
+      s.push({ mod:'Externalizá el sonido', side:'A', detail:'Está dentro de tu cabeza — empujalo hacia afuera, que venga de lejos, desde la pared de enfrente. Los sonidos internos tienen más carga.' });
+    // Izquierda o derecha → llevar al frente lo hace más manejable
+    else if(a.ubicacion === 0 || a.ubicacion === 1)
+      s.push({ mod:'Llevá el sonido al frente', side:'A', detail:'Está de costado — movelo hacia adelante, frente a vos, que sea más neutral y menos envolvente.' });
+  }
+
+  // — KINESTÉSICO —
+  // Peso pesado → aliviar. Liviano ya está reducido.
+  if(lejosDel50(k.peso) && k.peso > 50)
+    s.push({ mod:'Aliviá el peso', side:'K', detail:'Se siente pesado — imaginá que esa carga se vuelve más liviana, como si flotara hacia arriba y se disolviera.' });
+
+  // Intensidad fuerte → reducir. Débil ya está reducida.
+  if(lejosDel50(k.intensidad) && k.intensidad > 50)
+    s.push({ mod:'Bajá la intensidad', side:'K', detail:'Es muy intensa — reducila, que sea más leve y manejable. Como si bajaras el dial de volumen de esa sensación.' });
+
+  // Temperatura: caliente intensa → enfriar. Fría intensa → calentar (ambas extremas generan malestar)
+  if(lejosDel50(k.temperatura)){
+    if(k.temperatura > 50)
+      s.push({ mod:'Enfriá la sensación', side:'K', detail:'Está caliente — imaginá agua fresca corriendo por esa zona del cuerpo, que va bajando la temperatura.' });
+    else
+      s.push({ mod:'Calentá la sensación', side:'K', detail:'Está fría — imaginá calor suave expandiéndose por esa zona, como una manta tibia.' });
+  }
+
+  // Textura áspera/punzante → suavizar. Lisa ya está reducida.
+  if(k.textura !== null && k.textura !== undefined){
+    if(k.textura === 1 || k.textura === 2) // rugosa o punzante
+      s.push({ mod:'Suavizá la textura', side:'K', detail:'Se siente áspera o punzante — imaginá que esa superficie se vuelve suave, lisa, como seda o agua tibia.' });
+    else if(k.textura === 3) // difusa → darle forma la hace manejable
+      s.push({ mod:'Dale forma a la sensación', side:'K', detail:'Es difusa, sin límites claros — dale un borde definido. Cuando tiene forma, se puede trabajar con ella.' });
+  }
+
+  // Movimiento kinestésico: si hay movimiento, cambiar la dirección es la técnica más potente
+  if(k.movimiento === 1){
+    s.push({ mod:'Cambiá la dirección del movimiento', side:'K', detail:'La sensación se mueve — invertí su dirección. Si sube, hacela bajar. Si gira en sentido horario, girala al revés. Este cambio solo suele reducir la intensidad rápido.' });
+    if(k.ritmo === 2) // rápido → frenar
+      s.push({ mod:'Frenala en cámara lenta', side:'K', detail:'Se mueve rápido — reducí la velocidad, que fluya lento como melaza, hasta casi detenerse.' });
+  }
+
+  // Tensión tirante → soltar. Floja ya está reducida.
+  if(k.tension === 0)
+    s.push({ mod:'Soltá la tensión', side:'K', detail:'Está tirante, contraída — imaginá que esa tensión se suelta despacio, como si alguien aflojara un nudo.' });
+
+  // Profundidad: adentro del cuerpo o en superficie → moverla hacia afuera la separa de vos
+  if(k.profundidad === 2 || k.profundidad === 1 || k.profundidad === 0)
+    s.push({ mod:'Movela hacia afuera del cuerpo', side:'K', detail:'Está adentro — imaginá que esa sensación sale hacia la superficie, se separa de vos y queda flotando a un metro de distancia.' });
+  else if(k.profundidad === 3) // ya está fuera → alejarla más
+    s.push({ mod:'Llevala más lejos', side:'K', detail:'Ya está fuera de vos — empujala más lejos todavía, que se aleje, que se disuelva en el aire.' });
+
+  // — Fallback —
+  if(s.length === 0){
+    s.push({ mod:'Alejá la imagen', side:'V', detail:'Llevala al fondo de tu mente, cada vez más lejos, hasta que sea un punto pequeño.' });
+    s.push({ mod:'Bajá el brillo', side:'V', detail:'Hacela más oscura y apagada — como si le bajaras la luz lentamente.' });
+    s.push({ mod:'Achicá la imagen', side:'V', detail:'Reducila hasta que sea pequeña, casi un sello postal en la distancia.' });
+  }
+
+  // — SM CLAVE: mover al primer lugar si está en la lista —
+  if(smKlavePrev){
+    const idx = s.findIndex(x => x.mod === smKlavePrev.mod);
+    if(idx > 0){
+      const [smItem] = s.splice(idx, 1);
+      smItem._esClave = true; // marcar para mostrar badge
+      s.unshift(smItem);
+    } else if(idx === -1 && smKlavePrev){
+      // SM clave no está en esta sesión (sliders diferentes) — no forzar, ignorar
+    }
+  }
+
+  return s;
+}
+
+function ScreenSesion7(){
+  const suggestions = buildSuggestions();
+  // Defensa: si modIndex está fuera de rango, resetearlo
+  if(state.modIndex >= suggestions.length) state.modIndex = 0;
+  const i = state.modIndex;
+  const s = suggestions[i];
+  if(!s) return ScreenSesionTransicionCierre();
+
+  return `
+    <div class="screen pb-32">
+      ${Header({title:'Transformar', step:flowStep(7), total:flowTotal(), showTimer:true, showPause:true})}
+      <div class="px-5">
+        <div class="bg-mint-50 rounded-xl p-2.5 mb-4 text-center border border-mint-100">
+          <div class="text-[10px] uppercase tracking-widest text-mint-700 font-bold">
+            SUGERENCIA ${i+1} DE ${suggestions.length}
+            ${s._esClave ? `<span class="ml-2 bg-mint-500 text-white px-2 py-0.5 rounded-full text-[9px] font-bold">★ Tu clave</span>` : ''}
+          </div>
+        </div>
+
+        <div class="bg-white rounded-3xl p-6 shadow-sm border border-stone-100 mb-4 text-center">
+          <div class="inline-block w-14 h-14 rounded-full bg-ind-100 flex items-center justify-center text-ind-600 font-bold text-lg mb-3">${s.side}</div>
+          <h2 class="text-2xl font-bold text-ink mb-3">${s.mod}</h2>
+          <p class="text-sm text-stone-600 leading-relaxed">${s.detail}</p>
+        </div>
+
+        <div class="bg-ind-50 rounded-2xl p-4 mb-5 text-center">
+          <p class="text-xs text-stone-700 leading-relaxed">
+            <strong class="text-ind-600">Probala unos segundos en tu mente.</strong><br>
+            Notá si la sensación en el cuerpo cambia aunque sea un poco.<br>
+            <span class="text-stone-500">No tiene que ser enorme.</span><br>
+            Vos decidís si la aplicás o no.
+          </p>
+        </div>
+
+        <div class="space-y-2">
+          <button onclick="aplicarMod('${s.mod}')" class="w-full bg-mint-500 hover:opacity-90 text-white py-4 rounded-2xl font-semibold shadow-lg active:scale-[.98] transition focus-visible:ring-4 focus-visible:ring-mint-100">
+            ✓ Lo probé y ayudó
+          </button>
+          <button onclick="saltarMod()" class="w-full bg-stone-100 hover:bg-stone-200 text-stone-700 py-4 rounded-2xl font-semibold active:scale-[.98] transition focus-visible:ring-2 focus-visible:ring-ind-500">
+            No cambió mucho — siguiente
+          </button>
+          <button onclick="saltarMod()" class="w-full text-stone-500 hover:text-stone-700 py-2 rounded-xl text-xs underline">
+            prefiero saltar esta
+          </button>
+        </div>
+
+        <div class="mt-5 text-center text-xs text-stone-500">
+          Aplicadas hasta ahora: <strong class="text-mint-700">${state.modificaciones.length}</strong>
+        </div>
+
+        ${state.modificaciones.length >= 2 ? `
+          <div class="mt-4 mx-0 bg-mint-50 border border-mint-100 rounded-2xl p-3 flex items-center gap-3">
+            <div class="text-lg flex-shrink-0">J</div>
+            <div class="flex-1 min-w-0">
+              <div class="text-xs font-semibold text-ink">Esto está funcionando</div>
+              <div class="text-[11px] text-stone-600">Podemos ir mucho más profundo juntos.</div>
+            </div>
+            <a href="https://wa.me/5491170599871?text=${encodeURIComponent('Hola Jere, estoy haciendo el ejercicio de Soltá y está funcionando. Me gustaría profundizar.')}" target="_blank" class="flex-shrink-0 bg-mint-500 text-white text-[11px] font-semibold px-3 py-1.5 rounded-xl active:scale-95">
+              Hablemos
+            </a>
+          </div>
+        ` : ''}
+      </div>
+      ${DisclaimerFooter(true)}
+    </div>
+  `;
+}
+
+function aplicarMod(mod){
+  if(!state.modificaciones.includes(mod)) state.modificaciones.push(mod);
+  // Guardar la SM clave: la primera que aplicó (suele ser la más potente)
+  if(!state.smClave) {
+    const s = buildSuggestions().find(x => x.mod === mod);
+    if(s) state.smClave = { mod: s.mod, side: s.side };
+  }
+  // Feedback visual de éxito antes de avanzar
+  showSuccessFeedback(() => saltarMod());
+}
+function saltarMod(){
+  state.modIndex++;
+  if(state.modIndex >= buildSuggestions().length){
+    // Si el usuario aplicó al menos 1 sugerencia, mostrar su SM clave brevemente
+    if(state.smClave && state.modificaciones.length > 0){
+      go('sesion-smclave');
+    } else {
+      go('sesion-reintegracion');
+    }
+  } else {
+    render();
+  }
+}
+function showSuccessFeedback(cb){
+  const overlay = document.createElement('div');
+  overlay.style.cssText = 'position:fixed;inset:0;background:rgba(16,185,129,.15);display:flex;align-items:center;justify-content:center;z-index:50;animation:fade .2s ease-out;backdrop-filter:blur(2px);';
+  overlay.innerHTML = '<div style="width:120px;height:120px;border-radius:50%;background:#10B981;display:flex;align-items:center;justify-content:center;color:white;font-size:64px;animation:successPop .6s ease-out forwards;box-shadow:0 0 60px rgba(16,185,129,.5);">✓</div>';
+  document.body.appendChild(overlay);
+  // Inject keyframes once
+  if(!document.getElementById('successAnim')){
+    const s = document.createElement('style');
+    s.id = 'successAnim';
+    s.textContent = '@keyframes successPop{0%{transform:scale(0);opacity:0}50%{transform:scale(1.2);opacity:1}100%{transform:scale(1);opacity:1}}';
+    document.head.appendChild(s);
+  }
+  setTimeout(() => { overlay.remove(); cb && cb(); }, 700);
+}
+
+/* ============================================================
+   SM CLAVE — pantalla de cierre del Paso 7
+   Muestra la submodalidad más efectiva del usuario.
+   No requiere acción — solo reconocimiento.
+============================================================ */
+function ScreenSesionSmClave(){
+  const sm = state.smClave;
+  const sideLabels = { V:'Visual', A:'Auditiva', K:'Kinestésica' };
+  const sideColors = { V:'ind', A:'amb', K:'mint' };
+  const col = sm ? (sideColors[sm.side] || 'ind') : 'ind';
+
+  // Buscar en historial si esta SM ya apareció antes
+  const prev = state.sessions.filter(s => s.smClave && s.smClave.mod === sm?.mod);
+  const esPersistente = prev.length >= 2;
+
+  return `
+    <div class="screen pb-32 min-h-screen flex flex-col">
+      ${Header({title:'Tu submodalidad clave', showTimer:false, showPause:false})}
+      <div class="px-5 flex-1 flex flex-col justify-center text-center">
+
+        <div class="mx-auto w-20 h-20 rounded-full bg-${col}-100 flex items-center justify-center text-3xl mb-5 font-bold text-${col}-600">
+          ${sm?.side || '✦'}
+        </div>
+
+        <div class="text-[11px] uppercase tracking-widest text-${col}-600 font-bold mb-2">
+          ${sm ? sideLabels[sm.side] || sm.side : 'Sin datos'}
+        </div>
+        <h2 class="text-2xl font-bold text-ink mb-3">${sm?.mod || 'Ejercicio completado'}</h2>
+        <p class="text-sm text-stone-600 leading-relaxed mb-6">
+          Esta fue tu submodalidad más efectiva hoy.
+          ${esPersistente
+            ? `<br><br><strong class="text-${col}-700">Aparece seguido en tus sesiones</strong> — es probablemente tu palanca de cambio personal.`
+            : `<br><br>Con el tiempo, vas a descubrir si esta es tu palanca habitual o varía según lo que trabajés.`
+          }
+        </p>
+
+        ${esPersistente ? `
+          <div class="bg-${col}-50 border border-${col}-100 rounded-2xl p-3 mb-6 text-xs text-stone-700 leading-relaxed">
+            Cuando algo te pese, probá aplicar <strong>${sm?.mod}</strong> directamente, sin pasar por el mapeo completo.
+          </div>
+        ` : ''}
+
+        <button onclick="go('sesion-reintegracion')" class="w-full bg-ind-500 hover:bg-ind-600 text-white py-4 rounded-2xl font-semibold shadow-lg active:scale-[.98] transition">
+          Continuar →
+        </button>
+      </div>
+      ${DisclaimerFooter(true)}
+    </div>
+  `;
+}
+
+function ScreenSesionTransicionCierre(){
+  go('sesion-reintegracion');
+  return '';
+}
+
+/* ============================================================
+   RE-INTEGRACIÓN POST-DISOCIACIÓN
+   Cierra el protocolo de pantalla de cine: el usuario se
+   reintegra con la representación ya transformada.
+============================================================ */
+function ScreenSesionReintegracion(){
+  const fmt = state.formato === 'metafora' ? 'metáfora' : (state.formato || 'representación');
+  return `
+    <div class="screen pb-32">
+      ${Header({title:'Reintegrate', step:8, total:8, showTimer:true, showPause:true})}
+      <div class="px-5">
+
+        <div class="bg-white rounded-2xl p-5 mb-4 shadow-sm border border-stone-100">
+          <p class="text-sm text-stone-700 leading-relaxed mb-3">
+            La ${fmt} que ves en la pantalla ya no es la misma que al principio.
+            La transformaste.
+          </p>
+          <p class="text-sm text-stone-700 leading-relaxed">
+            Ahora <strong class="text-ink">volvé a entrar en ella.</strong>
+            Salí de la butaca. Caminá hacia la pantalla. Atravesala.
+          </p>
+        </div>
+
+        <div class="bg-gradient-to-b from-stone-900 to-stone-800 rounded-3xl p-6 my-5 relative overflow-hidden">
+          <div class="absolute top-3 left-1/2 -translate-x-1/2 text-[9px] text-white/40 uppercase tracking-widest">PANTALLA</div>
+          <div class="flex justify-center my-6">
+            <div class="w-40 h-24 bg-mint-500/20 border-2 border-mint-400/40 rounded-xl flex items-center justify-center">
+              <span class="text-white/70 text-xs italic">tu ${fmt} transformada</span>
+            </div>
+          </div>
+          <div class="text-center text-[10px] text-white/50 mt-2">→ entrá →</div>
+        </div>
+
+        <div class="bg-mint-50 rounded-xl p-3 mb-5 border border-mint-100">
+          <p class="text-xs text-stone-700 leading-relaxed">
+            <strong class="text-mint-700">Sentí cómo se siente desde adentro ahora.</strong>
+            Esto es lo que se lleva el cuerpo — no la explicación, la experiencia.<br><br>
+            <span class="text-stone-600">¿Notás algo diferente respecto a cuando empezaste?</span>
+          </p>
+        </div>
+
+        <button onclick="state._cambioConfirmado=true; go('sesion-futurepace')" class="w-full bg-ind-500 hover:bg-ind-600 text-white py-4 rounded-2xl font-semibold shadow-lg active:scale-[.98] transition">
+          Sí, algo cambió →
+        </button>
+        <button onclick="state._cambioConfirmado=false; go('sesion-cierre-respiro')" class="w-full mt-2 text-stone-500 hover:text-stone-700 py-2 text-xs underline">
+          No noto cambio todavía — igual continuar
+        </button>
+      </div>
+      ${DisclaimerFooter(true)}
+    </div>
+  `;
+}
+
+/* ============================================================
+   FUTURE PACE — solo si el usuario confirmó cambio
+============================================================ */
+function ScreenSesionFuturePace(){
+  const fmt = state.formato === 'metafora' ? 'metáfora' : 'imagen';
+  return `
+    <div class="screen pb-32">
+      ${Header({title:'Proyectalo al futuro', showTimer:true, showPause:true})}
+      <div class="px-5 pt-4">
+        <div class="bg-white rounded-2xl p-5 mb-4 shadow-sm border border-stone-100">
+          <p class="text-sm text-stone-700 leading-relaxed">
+            Ahora que algo cambió, hay un último paso.<br><br>
+            <strong class="text-ink">Pensá en una situación concreta</strong> — en los próximos días — donde antes aparecía lo que trabajaste hoy.
+          </p>
+        </div>
+
+        <div class="bg-ind-50 rounded-2xl p-4 mb-4 border border-ind-100">
+          <p class="text-xs text-stone-700 leading-relaxed">
+            Visualizate en esa situación con la <strong class="text-ind-600">${fmt} transformada</strong>. ¿Cómo te ves? ¿Qué sentís diferente? ¿Cómo respondés ahora?<br><br>
+            <span class="text-stone-500">Tomate 30 segundos. No hay respuesta correcta.</span>
+          </p>
+        </div>
+
+        <div class="flex flex-col items-center justify-center py-6">
+          <div class="w-20 h-20 rounded-full bg-ind-100 flex items-center justify-center text-3xl breathe-slow mb-3">✦</div>
+          <p class="text-xs text-stone-400 text-center">Cerrá los ojos si querés</p>
+        </div>
+
+        <button onclick="go('sesion-cierre-respiro')" class="w-full bg-ind-500 hover:bg-ind-600 text-white py-4 rounded-2xl font-semibold shadow-lg active:scale-[.98] transition">
+          Listo →
+        </button>
+      </div>
+      ${DisclaimerFooter(true)}
+    </div>
+  `;
+}
+
+/* ============================================================
+   CIERRE EN DOS FASES: RESPIRACIÓN → MEDICIÓN
+============================================================ */
+function ScreenCierreRespiro(){
+  return `
+    <div class="screen pb-32 min-h-screen flex flex-col">
+      ${Header({title:'Anclá el cambio', showBack:false})}
+      <div class="px-5 flex-1 flex flex-col justify-center text-center">
+        <p class="text-sm text-stone-600 mb-5">Antes de medir nada, regalate un momento.</p>
+
+        <div class="mx-auto w-48 h-48 rounded-full bg-mint-100 flex items-center justify-center mb-6 relative">
+          <div class="absolute inset-0 rounded-full bg-mint-500/20 breathe-slow"></div>
+          <div class="relative z-10 w-32 h-32 rounded-full bg-mint-500 flex items-center justify-center">
+            <span class="text-white text-4xl">✦</span>
+          </div>
+        </div>
+
+        <h2 class="text-xl font-bold text-ink mb-2">Inhalá. Exhalá.</h2>
+        <p class="text-sm text-stone-700 mb-1">Quedate con esta nueva sensación.</p>
+        <p class="text-xs text-stone-500 mb-2">Combiná una palabra con un gesto. Los dos juntos, en este momento.</p>
+        <div class="bg-mint-50 border border-mint-100 rounded-xl px-3 py-2 mb-4">
+          <p class="text-xs text-stone-600 leading-relaxed">
+            <strong class="text-mint-700">Mientras sentís la sensación en el cuerpo</strong>, elegí una palabra y hacé el gesto al mismo tiempo. Eso activa el ancla — palabra + gesto + estado físico simultáneos.
+          </p>
+        </div>
+
+        <input id="anclaInput" type="text" maxlength="40" value="${esc(state.ancla)}" placeholder="Escribí o tocá una de abajo..."
+          oninput="state.ancla=this.value"
+          class="w-full bg-white px-5 py-4 rounded-2xl text-center text-lg font-semibold text-mint-700 placeholder:text-stone-300 placeholder:font-normal placeholder:text-base border-2 border-mint-100 focus:outline-none focus:border-mint-500 mb-3">
+
+        <div class="flex flex-wrap gap-2 justify-center mb-4">
+          ${['calma','liviano','en paz','tranquilo','seguro','bien'].map(p => `
+            <button onclick="state.ancla='${p}'; var i=document.getElementById('anclaInput'); if(i) i.value='${p}'" class="bg-white hover:bg-mint-50 border border-stone-200 hover:border-mint-500 text-stone-700 text-xs px-3 py-1.5 rounded-full font-medium active:scale-95 transition focus-visible:ring-2 focus-visible:ring-mint-500">
+              ${p}
+            </button>
+          `).join('')}
+        </div>
+
+        <div class="bg-white rounded-2xl p-4 border border-stone-100 mb-5">
+          <div class="text-xs font-semibold text-ink mb-2">Elegí un gesto (opcional pero potente):</div>
+          <div class="grid grid-cols-3 gap-2">
+            ${[
+              ['🤜','Cerrar el puño'],
+              ['🫸','Mano en el pecho'],
+              ['🤌','Juntar los dedos'],
+              ['👁','Toque en la muñeca'],
+              ['🙏','Palmas juntas'],
+              ['✌️','El tuyo propio'],
+            ].map(([emoji, label]) => `
+              <button onclick="state.anclaGesto='${label}'; render()" class="${state.anclaGesto===label?'bg-mint-100 border-mint-400':'bg-stone-50 border-stone-200'} border rounded-xl py-2 px-1 text-center active:scale-95 transition">
+                <div class="text-xl">${emoji}</div>
+                <div class="text-[10px] text-stone-600 mt-0.5 leading-tight">${label}</div>
+              </button>
+            `).join('')}
+          </div>
+        </div>
+
+        <button onclick="go('sesion-cierre-medicion')" class="w-full bg-mint-500 hover:opacity-90 text-white py-4 rounded-2xl font-semibold shadow-lg active:scale-[.98] transition focus-visible:ring-4 focus-visible:ring-mint-100">
+          Continuar →
+        </button>
+      </div>
+      ${DisclaimerFooter(true)}
+    </div>
+  `;
+}
+
+function ScreenCierreMedicion(){
+  const after = state.intensityAfter ?? state.intensityBefore;
+  const delta = state.intensityAfter !== null ? (state.intensityBefore - after) : 0;
+  const elapsed = tickTimer();
+  return `
+    <div class="screen pb-32">
+      ${Header({title:'Tu sesión', showBack:false})}
+      <div class="px-5">
+        <div class="text-center mb-5">
+          <div class="inline-flex items-center justify-center w-16 h-16 rounded-full bg-mint-500 mb-3">
+            <span class="text-white text-2xl">✓</span>
+          </div>
+          <h2 class="text-xl font-extrabold text-ink">${(function(){ const frases=['Hiciste un trabajo bonito.','Bien hecho. Te llevás algo nuevo.','Gracias por darte este tiempo.','Eso que cambiaste cambió algo en vos.','Cada vuelta cuenta. Volvé cuando lo necesites.']; return frases[Math.floor(Math.random()*frases.length)]; })()}</h2>
+          ${state.ancla ? `<p class="text-sm text-mint-700 mt-1 italic">⚓ Anclaste "${esc(state.ancla)}"</p>` : ''}
+          ${elapsed ? `<div class="inline-block mt-2 text-[11px] text-ind-600 font-semibold bg-ind-50 px-3 py-1 rounded-full">⏱ ${elapsed} en total</div>` : ''}
+        </div>
+
+        <div class="bg-white rounded-2xl p-5 shadow-sm border border-stone-100 mb-4">
+          <div class="text-sm font-semibold text-ink mb-1">¿Qué tan fuerte lo sentís ahora?</div>
+          <p class="text-xs text-stone-500 mb-3">Cerrá los ojos un segundo, sentilo, después movés el slider.</p>
+          <div class="flex items-center gap-4">
+            <input type="range" min="0" max="10" value="${after}" oninput="
+              var a=parseInt(this.value);
+              state.intensityAfter=a;
+              document.getElementById('aDisplay').textContent=a;
+              document.getElementById('afterNow').textContent=a;
+              var d=state.intensityBefore-a;
+              document.getElementById('barFill').style.width=Math.max(0,d*10)+'%';
+              var el=document.getElementById('dText');
+              el.textContent=(d>0?'Bajaste '+d+' punto'+(d===1?'':'s'):(d<0?'Subió '+Math.abs(d)+' punto'+(Math.abs(d)===1?'':'s'):'Sin cambio por ahora — eso también es válido.'));
+              el.className='text-center text-sm font-bold mt-2 '+(d>0?'text-mint-700':d<0?'text-coral-500':'text-stone-500');
+            ">
+            <div class="text-4xl font-extrabold text-mint-500 w-12 text-right" id="aDisplay">${after}</div>
+          </div>
+
+          <div class="grid grid-cols-2 gap-3 mt-5 pt-4 border-t border-stone-100">
+            <div class="text-center">
+              <div class="text-[10px] text-stone-500 uppercase tracking-wider">Antes</div>
+              <div class="text-4xl font-extrabold text-coral-500">${state.intensityBefore}</div>
+            </div>
+            <div class="text-center">
+              <div class="text-[10px] text-stone-500 uppercase tracking-wider">Ahora</div>
+              <div class="text-4xl font-extrabold text-mint-500" id="afterNow">${after}</div>
+            </div>
+          </div>
+          <div class="mt-3 h-2 bg-stone-200 rounded-full overflow-hidden">
+            <div class="h-full bg-gradient-to-r from-coral-500 to-mint-500" id="barFill" style="width:${Math.max(0,delta*10)}%"></div>
+          </div>
+          <div class="text-center text-sm font-bold mt-2 ${delta>0?'text-mint-700':delta<0?'text-coral-500':'text-stone-500'}" id="dText">${state.intensityAfter===null?'Mové el slider para medir el cambio':delta>0?'Bajaste '+delta+' punto'+(delta===1?'':'s'):delta<0?'Subió '+Math.abs(delta)+' punto'+(Math.abs(delta)===1?'':'s'):'Sin cambio por ahora — eso también es válido.'}</div>
+        </div>
+
+        ${shouldShowDeepCTA() ? `
+          <div class="bg-mint-50 rounded-2xl p-4 mb-4 border border-mint-100">
+            <div class="flex items-start gap-3 mb-3">
+              <div class="w-10 h-10 rounded-full bg-mint-500 flex items-center justify-center text-white font-bold flex-shrink-0">J</div>
+              <div class="flex-1">
+                ${(function(){
+                  const d = state.intensityAfter !== null ? (state.intensityBefore - state.intensityAfter) : 0;
+                  if(d >= 3) return '<div class="text-sm font-semibold text-ink">Lograste un cambio real.</div><div class="text-xs text-stone-600 mt-0.5">En una sesión personal podemos ir todavía más profundo y hacer que dure.</div>';
+                  if(d > 0) return '<div class="text-sm font-semibold text-ink">Algo se movió.</div><div class="text-xs text-stone-600 mt-0.5">Con acompañamiento personalizado ese movimiento puede ir mucho más lejos.</div>';
+                  return '<div class="text-sm font-semibold text-ink">A veces el cambio no se mide todavía.</div><div class="text-xs text-stone-600 mt-0.5">Si sentís que esto no alcanza, podemos trabajarlo juntos en una sesión.</div>';
+                })()}
+              </div>
+            </div>
+            <a href="${(function(){
+              const d = state.intensityAfter !== null ? (state.intensityBefore - state.intensityAfter) : 0;
+              const msg = d >= 3
+                ? 'Hola Jere, hice el ejercicio en Soltá y bajé ' + d + ' puntos. Me gustaría profundizar en una sesión personal.'
+                : d > 0
+                ? 'Hola Jere, algo se movió con el ejercicio de Soltá. Me gustaría trabajarlo más a fondo con vos.'
+                : 'Hola Jere, hice el ejercicio de Soltá pero siento que necesito más acompañamiento. ¿Podemos hablar?';
+              return 'https://wa.me/5491170599871?text=' + encodeURIComponent(msg);
+            })()}" target="_blank" class="block bg-mint-500 hover:opacity-90 text-white text-sm text-center font-semibold py-3 rounded-xl active:scale-[.98] transition">
+              WhatsApp con Jere →
+            </a>
+          </div>
+        ` : ''}
+
+        <button onclick="finishSession()" class="w-full bg-ind-500 hover:bg-ind-600 text-white py-4 rounded-2xl font-semibold shadow-lg active:scale-[.98] transition">
+          Guardar y volver al inicio
+        </button>
+      </div>
+      ${DisclaimerFooter(true)}
+    </div>
+  `;
+}
+
+/* CTA de WhatsApp aparece solo a partir de la 3ra sesión, no en cada cierre */
+function shouldShowDeepCTA(){
+  return state.sessions.length >= 2;
+}
+
+function finishSession(){
+  const after = state.intensityAfter !== null ? state.intensityAfter : state.intensityBefore;
+  const today = new Date().toLocaleDateString('es-AR', { weekday:'short', day:'numeric' });
+  state.sessions.unshift({
+    date: 'Hoy ('+today+')',
+    label: (state.titulo || '').trim() || state.category || 'Sesión',
+    before: state.intensityBefore,
+    after: after,
+    category: state.category || 'Otro',
+    ancla: state.ancla || '',
+    ts: Date.now(),
+    smClave: state.smClave || null,
+    modificaciones: [...(state.modificaciones || [])],
+  });
+  if(state.sessions.length > 100) state.sessions = state.sessions.slice(0, 100);
+  // Resetear estado de sesión
+  state.modificaciones = [];
+  state.intensityAfter = null;
+  state.modIndex = 0;
+  state.ancla = '';
+  state.anclaGesto = null;
+  state.formato = null;
+  state.metaforaTipo = null;
+  state.titulo = '';
+  state.category = null;
+  state.intensityBefore = 5;
+  state.habitoContexto = null;
+  state.habitoContextoLibre = '';
+  state.habitoDisparador = '';
+  state.smClave = null;
+  state.showAdvanced = false;
+  state.showAdvancedA = false;
+  state.showAdvancedK = false;
+  // Resetear sliders al centro para próxima sesión
+  state.visual = { brillo:50, distancia:50, tamanio:50, color:null, asociado:null, movimiento:null, foco:null, ubicacion:null, marco:null, velocidad:null };
+  state.auditivo = { hay:'si', volumen:50, distancia:50, tono:null, ritmo:null, voz:null, velocidad:null, ubicacion:null, timbre:null };
+  state.kinestesico = { peso:50, intensidad:50, temperatura:50, ubicacion:'pecho', textura:null, movimiento:null, ritmo:null, tension:null, profundidad:null };
+  saveState();
+  go('home');
+}
+
+// Borrar todo el historial
+function clearHistory(){
+  if(!confirm('¿Borrar todo tu historial de ejercicios? Esta acción no se puede deshacer.')) return;
+  state.sessions = [];
+  saveState();
+  render();
+}
+
+// Exportar historial como texto descargable
+function exportHistory(){
+  if(!state.sessions.length){ alert('Todavía no hay ejercicios para exportar.'); return; }
+  const lines = ['Soltá — Mi historial de ejercicios','='.repeat(40),''];
+  state.sessions.forEach((s,i) => {
+    lines.push(`Ejercicio ${i+1} — ${s.date}`);
+    lines.push(`  Tema: ${s.label}`);
+    lines.push(`  Tipo: ${s.category}`);
+    lines.push(`  Intensidad antes: ${s.before}/10`);
+    lines.push(`  Intensidad después: ${s.after}/10 (bajaste ${s.before-s.after} puntos)`);
+    if(s.ancla) lines.push(`  Anclaje: ${s.ancla}`);
+    lines.push('');
+  });
+  const stats = {
+    total: state.sessions.length,
+    avg: (state.sessions.reduce((a,s) => a+(s.before-s.after), 0) / state.sessions.length).toFixed(1)
+  };
+  lines.push('—'.repeat(20));
+  lines.push(`Total: ${stats.total} ejercicios · Alivio promedio: ${stats.avg} puntos`);
+  lines.push('');
+  lines.push('Generado por Soltá — soltalo que te pesa.');
+  const txt = lines.join('\n');
+  const blob = new Blob([txt], {type:'text/plain;charset=utf-8'});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = `solta-historial-${new Date().toISOString().slice(0,10)}.txt`;
+  document.body.appendChild(a); a.click(); a.remove();
+  setTimeout(() => URL.revokeObjectURL(url), 1000);
+}
+
+function ScreenDiario(){
+  const ss = state.sessions;
+  const points = ss.slice().reverse().map((s,i,a) => ({
+    x: 20 + (i * (260 / Math.max(1, a.length-1))),
+    y: 90 - s.after * 7,
+  }));
+  const avgDelta = ss.length ? (ss.reduce((acc,s)=>acc+(s.before-s.after),0) / ss.length).toFixed(1) : '0';
+  // Tendencia real: comparar promedio primera mitad vs segunda mitad
+  let trendText = '';
+  if(ss.length >= 4){
+    const half = Math.floor(ss.length/2);
+    const recent = ss.slice(0,half);
+    const older = ss.slice(half);
+    const recentAvg = recent.reduce((a,s)=>a+s.after,0)/recent.length;
+    const olderAvg = older.reduce((a,s)=>a+s.after,0)/older.length;
+    if(recentAvg < olderAvg - 0.5) trendText = '↓ tendencia descendente';
+    else if(recentAvg > olderAvg + 0.5) trendText = '↑ tendencia creciente';
+    else trendText = '→ tendencia estable';
+  }
+  return `
+    <div class="screen pb-32">
+      <div class="px-5 pt-7 pb-2 flex items-center justify-between">
+        <div>
+          <div class="text-2xl font-extrabold text-ink">Tu diario</div>
+          <div class="text-xs text-stone-500">Tu progreso emocional</div>
+        </div>
+        <button onclick="go('home')" class="w-10 h-10 rounded-full bg-white shadow-sm flex items-center justify-center text-stone-600 active:scale-95">×</button>
+      </div>
+
+      ${ss.length === 0 ? `
+        <div class="mx-5 mt-6 bg-white rounded-2xl p-8 text-center shadow-sm border border-stone-100">
+          <div class="inline-block w-16 h-16 rounded-full bg-ind-50 flex items-center justify-center text-3xl mb-3">✦</div>
+          <h3 class="text-lg font-bold text-ink mb-2">Tu diario está esperando</h3>
+          <p class="text-sm text-stone-600 leading-relaxed mb-5">
+            Cuando hagas tu primer ejercicio vas a empezar a ver tu progreso emocional acá.
+          </p>
+          <button onclick="go('sesion-1')" class="bg-ind-500 hover:bg-ind-600 text-white px-5 py-3 rounded-2xl font-semibold text-sm shadow-md active:scale-[.98] transition">
+            Hacer mi primer ejercicio →
+          </button>
+        </div>
+      ` : `
+        <div class="mx-5 mt-4 bg-white rounded-2xl p-5 shadow-sm border border-stone-100">
+          <div class="text-sm font-semibold text-ink mb-1">Intensidad después de cada ejercicio</div>
+          ${trendText ? `<div class="text-xs text-mint-700 font-semibold mb-3">${trendText}</div>` : `<div class="text-xs text-stone-500 mb-3">${ss.length} ${ss.length===1?'ejercicio':'ejercicios'}</div>`}
+          ${ss.length >= 2 ? `
+            <svg viewBox="0 0 300 110" class="w-full h-28">
+              <defs>
+                <linearGradient id="grad" x1="0" x2="0" y1="0" y2="1">
+                  <stop offset="0%" stop-color="#6366F1" stop-opacity="0.3"/>
+                  <stop offset="100%" stop-color="#6366F1" stop-opacity="0"/>
+                </linearGradient>
+              </defs>
+              <path d="M ${points[0].x} 100 ${points.map(p=>`L ${p.x} ${p.y}`).join(' ')} L ${points[points.length-1].x} 100 Z" fill="url(#grad)"/>
+              ${points.map((p,i) => i>0 ? `<line x1="${points[i-1].x}" y1="${points[i-1].y}" x2="${p.x}" y2="${p.y}" stroke="#6366F1" stroke-width="2.5"/>` : '').join('')}
+              ${points.map(p => `<circle cx="${p.x}" cy="${p.y}" r="5" fill="#6366F1" stroke="white" stroke-width="2"/>`).join('')}
+            </svg>
+          ` : `
+            <p class="text-sm text-stone-600 py-6 text-center">Hacé un ejercicio más para ver tu gráfico de tendencia.</p>
+          `}
+          <div class="grid grid-cols-2 gap-2 mt-3 pt-3 border-t border-stone-100">
+            <div class="text-center"><div class="text-2xl font-extrabold text-ink">${ss.length}</div><div class="text-[10px] text-stone-600 uppercase">${ss.length===1?'ejercicio':'ejercicios'}</div></div>
+            <div class="text-center"><div class="text-2xl font-extrabold text-mint-500">${avgDelta}</div><div class="text-[10px] text-stone-600 uppercase">alivio promedio</div></div>
+          </div>
+        </div>
+
+        ${(function(){
+          // Nube de anclajes (palabras ancladas)
+          const anclas = ss.filter(s => s.ancla && s.ancla.trim()).map(s => s.ancla.trim().toLowerCase());
+          if(!anclas.length) return '';
+          const counts = {};
+          anclas.forEach(a => counts[a] = (counts[a]||0)+1);
+          const sorted = Object.entries(counts).sort((a,b) => b[1]-a[1]);
+          return `
+            <div class="mx-5 mt-4 bg-mint-50 rounded-2xl p-4 border border-mint-100">
+              <div class="text-sm font-semibold text-ink mb-2">⚓ Tus anclajes</div>
+              <p class="text-xs text-stone-600 mb-3">Las palabras que elegiste para anclarte después de cada ejercicio:</p>
+              <div class="flex flex-wrap gap-2">
+                ${sorted.map(([w,c]) => {
+                  const size = c >= 3 ? 'text-base' : c >= 2 ? 'text-sm' : 'text-xs';
+                  return `<span class="inline-block bg-white border border-mint-200 text-mint-700 px-3 py-1 rounded-full font-medium ${size}">${esc(w)}${c>1?' ·'+c:''}</span>`;
+                }).join('')}
+              </div>
+            </div>
+          `;
+        })()}
+
+        <div class="mx-5 mt-4">
+          <div class="flex items-center justify-between mb-3 px-1">
+            <div class="text-sm font-semibold text-ink">Ejercicios recientes</div>
+            <div class="flex gap-2">
+              <button onclick="exportHistory()" class="text-[11px] text-ind-600 hover:text-ind-700 font-medium underline">
+                Exportar
+              </button>
+              <button onclick="clearHistory()" class="text-[11px] text-coral-500 hover:text-coral-700 font-medium underline">
+                Borrar historial
+              </button>
+            </div>
+          </div>
+          <div class="space-y-2">
+            ${ss.map(s => `
+              <div class="bg-white rounded-2xl p-4 border border-stone-100">
+                <div class="flex items-start justify-between mb-1">
+                  <div class="font-semibold text-sm text-ink">${esc(s.label)}</div>
+                  <span class="text-[10px] bg-ind-100 text-ind-700 px-2 py-0.5 rounded-full font-medium">${esc(s.category)}</span>
+                </div>
+                <div class="text-[11px] text-stone-500">${esc(s.date)}${s.ancla ? ' · ⚓ ' + esc(s.ancla) : ''}</div>
+                <div class="flex items-center gap-2 mt-2.5">
+                  <span class="text-coral-500 font-bold">${s.before}</span>
+                  <div class="flex-1 h-1.5 bg-stone-200 rounded-full overflow-hidden">
+                    <div class="h-full bg-gradient-to-r from-coral-500 to-mint-500" style="width:${(s.before-s.after)*10}%"></div>
+                  </div>
+                  <span class="text-mint-500 font-bold">${s.after}</span>
+                </div>
+              </div>
+            `).join('')}
+          </div>
+        </div>
+      `}
+      ${DisclaimerFooter()}
+    </div>
+  `;
+}
+
+function ScreenSobre(){
+  const slide = state._sobreSlide || 0;
+  const slides = [
+    {
+      icon: '🧠',
+      title: 'Tu mente piensa en representaciones',
+      body: 'Cuando recordás algo difícil, tu mente lo muestra como una imagen, un sonido o una sensación. No el hecho en sí — su representación interna.',
+      color: 'from-ind-500 to-ind-600',
+    },
+    {
+      icon: '🎛️',
+      title: 'Cada representación tiene propiedades',
+      body: 'Esa imagen tiene brillo, distancia, tamaño. El sonido tiene volumen, tono. La sensación tiene peso, temperatura. Eso se llaman submodalidades.',
+      color: 'from-mint-500 to-ind-500',
+    },
+    {
+      icon: '✦',
+      title: 'Cambiás la forma, cambiás el impacto',
+      body: 'Soltá te guía paso a paso para mapear esas propiedades y ajustarlas. El contenido queda igual — lo que cambia es cómo te afecta.',
+      color: 'from-ind-600 to-stone-800',
+    },
+  ];
+  const s = slides[slide] || slides[0];
+  const isLast = slide >= slides.length - 1;
+
+  return `
+    <div class="screen pb-32">
+      ${Header({title:'¿Cómo funciona?'})}
+      <div class="px-5 pt-2">
+
+        <!-- SLIDES DE ONBOARDING -->
+        <div class="bg-gradient-to-br ${s.color} rounded-3xl p-6 mb-5 text-white min-h-[200px] flex flex-col justify-between">
+          <div class="text-5xl mb-4">${s.icon}</div>
+          <div>
+            <h2 class="text-lg font-bold leading-tight mb-2">${s.title}</h2>
+            <p class="text-sm opacity-90 leading-relaxed">${s.body}</p>
+          </div>
+        </div>
+
+        <!-- Indicadores de slide -->
+        <div class="flex justify-center gap-2 mb-5">
+          ${slides.map((_, i) => `<div class="w-2 h-2 rounded-full ${i===slide?'bg-ind-500':'bg-stone-300'} transition-colors"></div>`).join('')}
+        </div>
+
+        <!-- Botones de navegación -->
+        <div class="flex gap-3 mb-6">
+          ${slide > 0 ? `<button onclick="state._sobreSlide=${slide-1}; render()" class="flex-1 bg-stone-100 text-stone-700 py-3 rounded-2xl font-semibold text-sm active:scale-95">← Anterior</button>` : '<div class="flex-1"></div>'}
+          ${!isLast
+            ? `<button onclick="state._sobreSlide=${slide+1}; render()" class="flex-1 bg-ind-500 text-white py-3 rounded-2xl font-semibold text-sm active:scale-95">Siguiente →</button>`
+            : `<button onclick="state._sobreSlide=0; go('sesion-1')" class="flex-1 bg-ind-500 text-white py-3 rounded-2xl font-bold text-sm active:scale-95">Empezar →</button>`
+          }
+        </div>
+
+        <hr class="border-stone-200 mb-5">
+
+        <div class="bg-gradient-to-br from-ind-500 to-ind-600 rounded-3xl p-5 mb-4 text-white">
+          <div class="text-[11px] uppercase tracking-widest opacity-80 font-bold">PNL · Cambio de submodalidades</div>
+          <h2 class="text-xl font-bold mt-2 leading-tight">Tu mente piensa en imágenes, sonidos y sensaciones.</h2>
+          <p class="text-sm mt-3 opacity-90">Cambiando cómo recordás algo, cambiás cómo te impacta. No el contenido — la forma.</p>
+        </div>
+
+        <div class="bg-white rounded-2xl p-4 mb-2.5 border border-stone-100">
+          <div class="font-semibold text-sm text-ink mb-1">¿Qué son las submodalidades?</div>
+          <p class="text-sm text-stone-600 leading-relaxed">Son las propiedades finas de cómo percibís un recuerdo: brillo de la imagen, distancia, temperatura de la sensación. Pequeños ajustes en estas propiedades cambian la intensidad emocional.</p>
+        </div>
+        <div class="bg-white rounded-2xl p-4 mb-2.5 border border-stone-100">
+          <div class="font-semibold text-sm text-ink mb-1">¿Cómo funciona?</div>
+          <p class="text-sm text-stone-600 leading-relaxed">7 pasos guiados: chequeás cómo te sentís, elegís qué trabajar, le ponés un título, encontrás una representación (imagen o metáfora), la disociás en una pantalla mental, indagás cómo es (V/A/K), modificás y anclás.</p>
+        </div>
+        <div class="bg-white rounded-2xl p-4 mb-2.5 border border-stone-100">
+          <div class="font-semibold text-sm text-ink mb-1">¿Para qué sirve?</div>
+          <p class="text-sm text-stone-600 leading-relaxed">Para situaciones conflictivas, sensaciones displacenteras, dolores físicos (no reemplazando tratamiento) y emociones que se quieren modificar.</p>
+        </div>
+        <div class="bg-white rounded-2xl p-4 mb-2.5 border border-stone-100">
+          <div class="font-semibold text-sm text-ink mb-1">¿Es seguro?</div>
+          <p class="text-sm text-stone-600 leading-relaxed">Sí. Trabajás siempre disociado y vos decidís cada cambio. La app solo sugiere; no induce.</p>
+        </div>
+
+        <div class="bg-stone-50 rounded-2xl p-4 mt-4 border border-stone-200">
+          <div class="font-semibold text-xs text-ink mb-1">Fuente</div>
+          <p class="text-[11px] text-stone-600 leading-relaxed">Andreas &amp; Andreas, "Use su cabeza para variar". Saint Paul &amp; Tenenbaum, "Excelencia Mental".</p>
+        </div>
+
+        <div class="bg-mint-50 rounded-2xl p-4 mt-4 border border-mint-100">
+          <div class="text-sm font-semibold text-ink mb-1">¿Sesiones personales?</div>
+          <a href="${WA}" target="_blank" rel="noopener" class="block mt-2 bg-mint-500 hover:opacity-90 text-white text-sm text-center font-semibold py-3 rounded-xl">Escribime por WhatsApp</a>
+        </div>
+      </div>
+      ${DisclaimerFooter()}
+    </div>
+  `;
+}
+
+function ScreenAviso(){
+  return `
+    <div class="screen pb-12">
+      ${Header({title:'Aviso importante'})}
+      <div class="px-5">
+        <div class="bg-amb-50 border border-amb-100 rounded-2xl p-5">
+          <div class="text-3xl mb-2">⚠</div>
+          <p class="text-sm text-ink leading-relaxed mb-3"><strong>Soltá</strong> es una herramienta de auto-conocimiento basada en <strong>Programación Neurolingüística (PNL)</strong>.</p>
+          <p class="text-sm text-stone-700 leading-relaxed mb-3">Los ejercicios que ofrece <strong>NO reemplazan</strong> ningún tratamiento psicológico, psiquiátrico o médico, ni constituyen una sesión profesional de coaching o terapia.</p>
+          <p class="text-sm text-stone-700 leading-relaxed mb-3">Si estás atravesando una crisis emocional o sentís que <strong>podés lastimarte a vos mismo o a otros</strong>, buscá <strong>ayuda profesional inmediata</strong> o contactá los servicios de emergencia de tu país.</p>
+          <p class="text-sm text-stone-700 leading-relaxed">También podés encontrar líneas de ayuda internacionales en <a href="https://findahelpline.com" target="_blank" rel="noopener" class="text-ind-600 underline font-semibold">findahelpline.com</a>.</p>
+        </div>
+        <div class="mt-4 bg-white rounded-2xl p-4 border border-stone-100">
+          <div class="text-sm font-semibold text-ink mb-2">Líneas de ayuda (Argentina)</div>
+          <ul class="text-xs text-stone-700 space-y-1.5">
+            <li>SOS Un Amigo Anónimo: <strong>135</strong> (Buenos Aires) o 0800-345-1435</li>
+            <li>Centro de Asistencia al Suicida: <strong>(011) 5275-1135</strong></li>
+            <li>Salud Mental Responde: <strong>0800-999-0091</strong></li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  `;
+}
+
+function render(){
+  const map = {
+    portada: ScreenPortada,
+    home: ScreenHome,
+    'sesion-1': ScreenSesion1,
+    'sesion-musica': ScreenSesionMusica,
+    'sesion-2a': ScreenSesion2a,
+    'sesion-2b': ScreenSesion2b,
+    'sesion-2c': ScreenSesion2c,
+    'sesion-habito': ScreenSesionHabito,
+    'sesion-metafora-tipo': ScreenSesionMetaforaTipo,
+    'sesion-K-first': ScreenSesionK,
+    'sesion-V': ScreenSesionV,
+    'sesion-A': ScreenSesionA,
+    'sesion-K': ScreenSesionK,
+    'sesion-7': ScreenSesion7,
+    'sesion-smclave': ScreenSesionSmClave,
+    'sesion-reintegracion': ScreenSesionReintegracion,
+    'sesion-futurepace': ScreenSesionFuturePace,
+    'sesion-cierre-respiro': ScreenCierreRespiro,
+    'sesion-cierre-medicion': ScreenCierreMedicion,
+    diario: ScreenDiario,
+    sobre: ScreenSobre,
+    aviso: ScreenAviso,
+  };
+  document.getElementById('app').innerHTML = (map[state.screen] || ScreenPortada)();
+  // Si el audio estaba activo y el contexto quedó suspendido, reactivarlo
+  if(Audio432.isPlaying()){
+    Audio432.resumeIfSuspended();
+  }
+  if(!state.screen.startsWith('sesion-')){
+    if(timerInterval){ clearInterval(timerInterval); timerInterval = null; }
+    if(Audio432.isPlaying()) Audio432.toggle(); // detener música al salir de sesión
+  } else {
+    startTimerTick();
+  }
+  window._renderAudioPlayer && window._renderAudioPlayer();
+}
+
+let timerInterval = null;
+function startTimerTick(){
+  if(timerInterval) clearInterval(timerInterval);
+  timerInterval = setInterval(function(){
+    var el = document.getElementById('timer');
+    if(el) el.textContent = tickTimer();
+  }, 1000);
+}
+
+if('serviceWorker' in navigator){
+  window.addEventListener('load', function(){
+    navigator.serviceWorker.register('./sw.js').catch(function(err){
+      console.warn('SW registration failed:', err);
+    });
+  });
+}
+
+render();
+</script>
+</body>
+</html>
